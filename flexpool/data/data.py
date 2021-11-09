@@ -1,0 +1,50 @@
+import torch
+import torchvision.transforms as transforms
+from torch.utils.data import DataLoader, random_split
+from torchvision import datasets
+
+
+def get_datasets(args):
+    if args.normalize:
+        transform = transforms.Compose([
+            transforms.RandomHorizontalFlip(),
+            transforms.ToTensor(),
+            transforms.Normalize([0.5], [0.5]),
+        ])
+    else:
+        transform = transforms.Compose([
+            transforms.RandomHorizontalFlip(),
+            transforms.ToTensor(),
+        ])
+
+    train = datasets.CIFAR10(
+        args.data_path,
+        train=True,
+        download=True,
+        transform=transform,
+    )
+    test = datasets.CIFAR10(
+        args.data_path,
+        train=False,
+        download=True,
+        transform=transform)
+
+    return train, test
+
+
+def get_dataloaders(args):
+    dataset_train, dataset_test = get_datasets(args)
+
+    train_size, val_size = args.split_sizes
+    
+    train_data, val_data = random_split(
+        dataset_train, [train_size, val_size], torch.Generator().manual_seed(args.seed))
+
+    loader_args = dict(batch_size=args.batch_size,
+                       num_workers=args.num_workers, drop_last=True)
+    
+    train_loader = DataLoader(train_data, shuffle=True, **loader_args)
+    val_loader = DataLoader(val_data, shuffle=False, **loader_args)
+    test_loader = DataLoader(dataset_test, shuffle=False, **loader_args)
+
+    return train_loader, val_loader, test_loader
