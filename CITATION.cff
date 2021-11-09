@@ -1,0 +1,22 @@
+cff-version: "1.2.0"
+message: "If you use this software, please cite it using these metadata."
+title: "Hyper-Flexible Convolutional Neural Networks Based on Generalized Lehmer and Power Means"
+authors: 
+  -
+    family-names: Terziyan
+    given-names: Vagan
+    orcid: "https://orcid.org/0000-0002-3174-0170"
+  -
+    family-names: Malyk
+    given-names: Diana
+  -
+    family-names: Golovianko
+    given-names: Mariia
+    orcid: "https://orcid.org/0000-0003-0734-4028"
+  -
+    family-names: Branytskyi
+    given-names: Vladyslav
+    orcid: "https://orcid.org/0000-0002-0821-8878"
+repository-code: "https://github.com/Adversarial-Intelligence-Group/flexpool"
+date-released: 2021
+license: MIT
