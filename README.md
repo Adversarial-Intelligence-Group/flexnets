@@ -14,7 +14,7 @@ This project contains a new types of pooling called Generalized Lehmer Pooling a
 
 If you use the results presented in this paper or the code from the repository, please cite the relevant [paper]():
 ```
-@article{terziyan2021glp,
+@article{terziyan2021flexpool,
   title={Hyper-Flexible Convolutional Neural Networks Based on Generalized Lehmer and Power Means},
   author={Terziyan, Vagan and Malyk, Diana and Golovianko, Mariia and Branytskyi, Vladyslav},
   journal={},
