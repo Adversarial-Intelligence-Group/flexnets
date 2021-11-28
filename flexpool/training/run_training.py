@@ -27,6 +27,7 @@ def run_training(args: Namespace):
 
     train_loader, val_loader, test_loader = get_dataloaders(args)
 
+    # FIXME
     pools: Dict[str, nn.Module] = {
         'max_pool2d': nn.MaxPool2d(kernel_size=2, stride=2),
         'generalized_lehmer_pool': GeneralizedLehmerPool2d(args.alpha, args.beta, kernel_size=2, stride=2),
@@ -91,16 +92,12 @@ def run_training(args: Namespace):
         'Loss validation': [np.mean(val_loss)],
     })
 
-    if (type(model.pool1) is GeneralizedLehmerPool2d or
-            type(model.pool1) is GeneralizedPowerMeanPool2d):
-        df += pd.DataFrame(data={
-            'Pool1 alpha': [model.pool1.alpha.item()],
-            'Pool2 alpha': [model.pool2.alpha.item()],
-            'Pool3 alpha': [model.pool3.alpha.item()],
-            'Pool1 beta': [model.pool1.beta.item()],
-            'Pool2 beta': [model.pool2.beta.item()],
-            'Pool3 beta': [model.pool3.beta.item()],
-        })
+    module_types = {key: type(module) for key, module in model.named_modules()}
+    for name, p in model.named_parameters():
+        if (module_types[name.split('.')[0]] is GeneralizedLehmerPool2d or
+                module_types[name.split('.')[0]] is GeneralizedPowerMeanPool2d):
+            df[name] = [p.data.item()]
+
     save_path = os.path.join(results_root, args.run_id)
     os.makedirs(save_path, exist_ok=True)
-    df.to_csv(os.path.join(save_path, 'final.csv'))
+    df.to_json(os.path.join(save_path, 'final.json'), orient='records')

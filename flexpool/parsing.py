@@ -10,7 +10,8 @@ def add_train_args(parser: ArgumentParser):
                         help='Run ID')
     parser.add_argument('--pooling_type',
                         type=str,
-                        choices=['max_pool2d', 'generalized_lehmer_pool, generalized_power_mean_pool'])
+                        default='generalized_lehmer_pool',
+                        choices=['max_pool2d', 'generalized_lehmer_pool', 'generalized_power_mean_pool'])
     parser.add_argument('--device',
                         type=str,
                         choices=['cuda', 'cpu'],
@@ -55,7 +56,7 @@ def add_train_args(parser: ArgumentParser):
     # Training arguments
     parser.add_argument('--epochs',
                         type=int,
-                        default=1,
+                        default=30,
                         help='Number of epochs to run (default: 30)')
     parser.add_argument('--batch_size',
                         type=int,
