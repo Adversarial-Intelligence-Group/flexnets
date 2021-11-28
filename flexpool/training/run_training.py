@@ -9,11 +9,11 @@ import numpy as np
 import pandas as pd
 from pathlib import Path
 
-from models import Net
+from flexpool.models import Net
 from .train import train
 from .validate import validate
-from data import get_dataloaders
-from nn.pooling import GeneralizedLehmerPool2d, GeneralizedPowerMeanPool2d
+from flexpool.data import get_dataloaders
+from flexpool.nn.pooling import GeneralizedLehmerPool2d, GeneralizedPowerMeanPool2d
 from .utils import load_checkpoint, save_checkpoint
 
 
@@ -49,7 +49,7 @@ def run_training(args: Namespace):
             model,
             optimizer,
             scheduler,
-            args.device is 'gpu'
+            args.device == 'cuda'
         )
 
     model.to(device)
@@ -59,8 +59,9 @@ def run_training(args: Namespace):
 
     for epoch in range(0, args.epochs):
         train_losses, train_accs = train(epoch, model, train_loader, optimizer,
-              scheduler, loss_func, writer)
-        val_losses, val_accs = validate(epoch, model, val_loader, loss_func, writer)
+                                         scheduler, loss_func, writer)
+        val_losses, val_accs = validate(
+            epoch, model, val_loader, loss_func, writer)
         writer.flush()
 
         train_loss += train_losses
@@ -69,27 +70,37 @@ def run_training(args: Namespace):
         val_accuracy += val_accs
 
         if args.save_dir is not None:
-            checkpoint_path = os.path.join(args.save_dir, epoch, 'checkpoint.pth')
+            checkpoint_path = os.path.join(
+                args.save_dir, str(epoch))
+            os.makedirs(checkpoint_path, exist_ok=True)
+            checkpoint_path = os.path.join(checkpoint_path, 'checkpoint.pth')
             save_checkpoint(checkpoint_path, model, optimizer, scheduler)
-        
+
     results_root = Path(args.save_dir).parent
     df = pd.DataFrame(data={
-        'Device': args.device,
-        'Epochs': args.epochs,
-        'Batch size': args.batch_size,
-        'Pooling type': args.pooling_type,
-        'Alpha': args.alpha,
-        'Beta': args.beta,
-        'Learning rate': args.lr,
-        'Accuracy train': np.mean(train_accuracy),
-        'Accuracy validation': np.mean(val_accuracy),
-        'Loss train': np.mean(train_loss),
-        'Loss validation': np.mean(val_loss),
-        'Pool1 alpha': model.pool1.alpha.item(),
-        'Pool2 alpha': model.pool2.alpha.item(),
-        'Pool3 alpha': model.pool3.alpha.item(),
-        'Pool1 beta': model.pool1.beta.item(),
-        'Pool2 beta': model.pool2.beta.item(),
-        'Pool3 beta': model.pool3.beta.item(),
+        'Device': [args.device],
+        'Epochs': [args.epochs],
+        'Batch size': [args.batch_size],
+        'Pooling type': [args.pooling_type],
+        'Alpha': [args.alpha],
+        'Beta': [args.beta],
+        'Learning rate': [args.lr],
+        'Accuracy train': [np.mean(train_accuracy)],
+        'Accuracy validation': [np.mean(val_accuracy)],
+        'Loss train': [np.mean(train_loss)],
+        'Loss validation': [np.mean(val_loss)],
     })
-    df.to_csv(os.path.join(results_root, args.run_id, 'final.csv'))
+
+    if (type(model.pool1) is GeneralizedLehmerPool2d or
+            type(model.pool1) is GeneralizedPowerMeanPool2d):
+        df += pd.DataFrame(data={
+            'Pool1 alpha': [model.pool1.alpha.item()],
+            'Pool2 alpha': [model.pool2.alpha.item()],
+            'Pool3 alpha': [model.pool3.alpha.item()],
+            'Pool1 beta': [model.pool1.beta.item()],
+            'Pool2 beta': [model.pool2.beta.item()],
+            'Pool3 beta': [model.pool3.beta.item()],
+        })
+    save_path = os.path.join(results_root, args.run_id)
+    os.makedirs(save_path, exist_ok=True)
+    df.to_csv(os.path.join(save_path, 'final.csv'))

@@ -5,8 +5,9 @@ from torch import Tensor
 from torch.utils.data.dataloader import DataLoader
 from torch.utils.tensorboard.writer import SummaryWriter
 from tqdm import tqdm
+from flexpool.nn.pooling import GeneralizedLehmerPool2d, GeneralizedPowerMeanPool2d
 
-from training.utils import accuracy, clip_data
+from .utils import accuracy, clip_data
 
 
 def validate(epoch: int,
@@ -30,7 +31,10 @@ def validate(epoch: int,
             acc = accuracy(outputs, targets)
             loss = loss_func(outputs, targets)
             loss_sum += loss.item()
-            accs_sum += acc
+            if isinstance(acc, torch.Tensor):
+                accs_sum += acc.item()
+            else:
+                accs_sum += acc
 
         global_step = epoch * len(val_loader) + idx
 
@@ -48,7 +52,8 @@ def validate(epoch: int,
         writer.add_scalar('val/accuracy', accs_avg, global_step=epoch)
 
     # FIXME
-    if model.name == "generalized_lehmer_pool":
+    if (type(model.pool1) is GeneralizedLehmerPool2d or
+            type(model.pool1) is GeneralizedPowerMeanPool2d):
         alpha_pools = ["pool1.alpha", "pool2.alpha", "pool3.alpha"]
         beta_pools = ["pool1.beta", "pool2.beta", "pool3.beta"]
         for name, p in model.named_parameters():

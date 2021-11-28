@@ -6,7 +6,7 @@ from torch.utils.data.dataloader import DataLoader
 from torch.utils.tensorboard.writer import SummaryWriter
 from tqdm import tqdm
 
-from training.utils import accuracy
+from .utils import accuracy
 
 
 def train(
@@ -18,7 +18,7 @@ def train(
         loss_func: Callable,
         writer: SummaryWriter = None):
     model.train()
-    
+
     loss_sum, accs_sum = 0, 0
 
     for idx, (images, targets) in enumerate(tqdm(train_loader)):
@@ -28,7 +28,7 @@ def train(
         optimizer.zero_grad()
         outputs = model(images)
         loss = loss_func(outputs, targets)
-        
+
         loss.backward()
         optimizer.step()
         scheduler.step()
@@ -39,12 +39,14 @@ def train(
         loss_sum += loss.item()
         if isinstance(acc, torch.Tensor):
             accs_sum += acc.item()
+        else:
+            accs_sum += acc
 
         global_step = epoch * len(train_loader) + idx
 
         if writer is not None:
             writer.add_scalar('train/iter_loss', loss.item(),
-                            global_step=global_step)
+                              global_step=global_step)
 
     if writer is not None:
         loss_avg = loss_sum / len(train_loader)

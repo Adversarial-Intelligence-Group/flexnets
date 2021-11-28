@@ -10,15 +10,15 @@ def add_train_args(parser: ArgumentParser):
                         help='Run ID')
     parser.add_argument('--pooling_type',
                         type=str,
-                        choises=['max_pool2d', 'generalized_lehmer_pool, generalized_power_mean_pool'])
+                        choices=['max_pool2d', 'generalized_lehmer_pool, generalized_power_mean_pool'])
     parser.add_argument('--device',
-                        type=int,
-                        choices=['gpu', 'cpu'],
-                        default='gpu',
-                        help='Device for training (default: gpu)')
+                        type=str,
+                        choices=['cuda', 'cpu'],
+                        default='cuda',
+                        help='Device for training (default: cuda)')
     parser.add_argument('--data_path',
                         type=str,
-                        default='./.assets/data',
+                        default='./.assets/data/',
                         help='Path to data')
     parser.add_argument('--checkpoint_path',
                         type=str,
@@ -47,11 +47,15 @@ def add_train_args(parser: ArgumentParser):
                         default=4,
                         help='Number of workers for data loading (default: 4)',
                         )
+    parser.add_argument('--normalize',
+                        action='store_true',
+                        default=False
+                        )
 
     # Training arguments
     parser.add_argument('--epochs',
                         type=int,
-                        default=30,
+                        default=1,
                         help='Number of epochs to run (default: 30)')
     parser.add_argument('--batch_size',
                         type=int,
@@ -65,30 +69,31 @@ def add_train_args(parser: ArgumentParser):
 
 def add_glm_args(parser: ArgumentParser):
     parser.add_argument('--alpha',
-                        type=int,
+                        type=float,
                         default=1.5,
-                        min=1.0001,
-                        max=2.718,
+                        # min=1.0001,
+                        # max=2.718,
                         help='Alpha parameter for GLP')
     parser.add_argument('--beta',
-                        type=int,
+                        type=float,
                         default=1.5,
-                        min=-2.5,
-                        max=1.5,
+                        # min=-2.5,
+                        # max=1.5,
                         help='Beta parameter for GLP')
+
 
 def add_gpm_args(parser: ArgumentParser):
     parser.add_argument('--gamma',
-                        type=int,
+                        type=float,
                         default=1.5,
-                        min=1.0001,
-                        max=2.718,
+                        # min=1.0001,
+                        # max=2.718,
                         help='Alpha parameter for GPM')
     parser.add_argument('--delta',
-                        type=int,
+                        type=float,
                         default=1.5,
-                        min=-2.5,
-                        max=1.5,
+                        # min=-2.5,
+                        # max=1.5,
                         help='Beta parameter for GPM')
 
 
@@ -124,9 +129,13 @@ def parse_train_args() -> Namespace:
     parser = ArgumentParser()
     add_train_args(parser)
     temp_args, unk_args = parser.parse_known_args()
-    if temp_args.pooling_type == 'generalized_lehmer_pool':
-        add_glm_args(parser)
-    elif temp_args.pooling_type == 'generalized_power_mean_pool':
-        add_gpm_args(parser)
+    # if temp_args.pooling_type == 'generalized_lehmer_pool':
+    #     add_glm_args(parser)
+    # elif temp_args.pooling_type == 'generalized_power_mean_pool':
+    #     add_gpm_args(parser)
+    # FIXME needed for init layers in main
+    add_glm_args(parser)
+    add_gpm_args(parser)
     args = parser.parse_args()
+    modify_train_args(args)
     return args

@@ -4,7 +4,12 @@ import torch.nn as nn
 class Net(nn.Module):
     def __init__(self, pool: nn.Module):
         super(Net, self).__init__()
-        self.pool = pool
+        # FIXME if you call the same layer, the same underlying parameters
+        # (weights and bias) will be used for the computation.
+        # https://discuss.pytorch.org/t/calling-a-layer-multiple-times-will-produce-the-same-weights/28951
+        self.pool1 = pool
+        self.pool2 = pool
+        self.pool3 = pool
 
         self.block1 = nn.Sequential(
             nn.Conv2d(in_channels=3, out_channels=32,
@@ -46,9 +51,9 @@ class Net(nn.Module):
         )
 
     def forward(self, x):
-        x = self.pool(self.block1(x))
-        x = self.drop2(self.pool(self.block2(x)))
-        x = self.pool(self.block3(x))
+        x = self.pool1(self.block1(x))
+        x = self.drop2(self.pool2(self.block2(x)))
+        x = self.pool3(self.block3(x))
         x = x.view(x.size(0), -1)
         x = self.fc_layer(x)
         return x
