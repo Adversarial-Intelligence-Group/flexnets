@@ -6,11 +6,11 @@ from argparse import ArgumentParser, Namespace
 def add_train_args(parser: ArgumentParser):
     parser.add_argument('--run_id',
                         type=str,
-                        default='ex_1',
+                        default='ex_2',
                         help='Run ID')
     parser.add_argument('--pooling_type',
                         type=str,
-                        default='max_pool2d',
+                        default='generalized_lehmer_pool',
                         choices=['max_pool2d', 'generalized_lehmer_pool', 'generalized_power_mean_pool'])
     parser.add_argument('--device',
                         type=str,
@@ -77,7 +77,7 @@ def add_glm_args(parser: ArgumentParser):
                         help='Alpha parameter for GLP')
     parser.add_argument('--beta',
                         type=float,
-                        default=1.5,
+                        default=1.,
                         # min=-2.5,
                         # max=1.5,
                         help='Beta parameter for GLP')
@@ -92,7 +92,7 @@ def add_gpm_args(parser: ArgumentParser):
                         help='Alpha parameter for GPM')
     parser.add_argument('--delta',
                         type=float,
-                        default=1.5,
+                        default=1.,
                         # min=-2.5,
                         # max=1.5,
                         help='Beta parameter for GPM')

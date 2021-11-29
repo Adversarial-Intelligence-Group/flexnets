@@ -6,7 +6,7 @@ from torch.utils.data.dataloader import DataLoader
 from torch.utils.tensorboard.writer import SummaryWriter
 from tqdm import tqdm
 
-from .utils import accuracy, clip_data, clip_poolings
+from .utils import accuracy, clip_data, clip_poolings, plot_poolings
 
 
 def validate(epoch: int,
@@ -40,6 +40,7 @@ def validate(epoch: int,
         if writer is not None:
             writer.add_scalar(
                 'val/iter_loss', loss.item(), global_step=global_step)
+            plot_poolings(model, writer, 'val/iter_pool', global_step)
 
     if writer is not None:
         loss_avg = loss_sum / len(val_loader)

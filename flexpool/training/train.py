@@ -6,7 +6,7 @@ from torch.utils.data.dataloader import DataLoader
 from torch.utils.tensorboard.writer import SummaryWriter
 from tqdm import tqdm
 
-from .utils import accuracy
+from .utils import accuracy, plot_poolings
 
 
 def train(
@@ -47,6 +47,7 @@ def train(
         if writer is not None:
             writer.add_scalar('train/iter_loss', loss.item(),
                               global_step=global_step)
+            plot_poolings(model, writer, 'train/iter_pool', global_step)
 
     if writer is not None:
         loss_avg = loss_sum / len(train_loader)

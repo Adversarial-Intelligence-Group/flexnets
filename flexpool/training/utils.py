@@ -3,6 +3,7 @@ import torch
 import torch.nn as nn
 from torch.optim.lr_scheduler import _LRScheduler
 from flexpool.nn.pooling import GeneralizedLehmerPool2d, GeneralizedPowerMeanPool2d
+from torch.utils.tensorboard.writer import SummaryWriter
 
 
 def accuracy(output: torch.Tensor, target: torch.Tensor, top_k=(1,)) -> Union[torch.Tensor, List[torch.Tensor]]:
@@ -23,6 +24,20 @@ def accuracy(output: torch.Tensor, target: torch.Tensor, top_k=(1,)) -> Union[to
         res = res[0]
 
     return res
+
+
+def plot_poolings(model: nn.Module, writer: SummaryWriter, tag: str, global_step: int):
+    module_types = {key: type(module) for key, module in model.named_modules()}
+    for name, p in model.named_parameters():
+        if (module_types[name.split('.')[0]] is GeneralizedLehmerPool2d):
+            if ("alpha" in name) or ("beta" in name):
+                writer.add_scalar(tag+'/'+name, p.data.item(),
+                                  global_step=global_step)
+
+        if (module_types[name.split('.')[0]] is GeneralizedPowerMeanPool2d):
+            if ("gamma" in name) or ("delta" in name):
+                writer.add_scalar(tag+'/'+name, p.data.item(),
+                                  global_step=global_step)
 
 
 def clip_poolings(model: nn.Module):
