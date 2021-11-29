@@ -10,7 +10,7 @@ def add_train_args(parser: ArgumentParser):
                         help='Run ID')
     parser.add_argument('--pooling_type',
                         type=str,
-                        default='generalized_lehmer_pool',
+                        default='max_pool2d',
                         choices=['max_pool2d', 'generalized_lehmer_pool', 'generalized_power_mean_pool'])
     parser.add_argument('--device',
                         type=str,

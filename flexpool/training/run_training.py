@@ -1,6 +1,6 @@
 import os
 from argparse import Namespace
-from typing import Dict
+from typing import Dict, List
 
 import torch
 import torch.nn as nn
@@ -28,13 +28,19 @@ def run_training(args: Namespace):
     train_loader, val_loader, test_loader = get_dataloaders(args)
 
     # FIXME
-    pools: Dict[str, nn.Module] = {
-        'max_pool2d': nn.MaxPool2d(kernel_size=2, stride=2),
-        'generalized_lehmer_pool': GeneralizedLehmerPool2d(args.alpha, args.beta, kernel_size=2, stride=2),
-        'generalized_power_mean_pool': GeneralizedPowerMeanPool2d(args.gamma, args.delta, kernel_size=2, stride=2)
+    pools: Dict[str, List] = {
+        'max_pool2d': [nn.MaxPool2d,
+                       {'kernel_size': 2, 'stride': 2}],
+        'generalized_lehmer_pool': [GeneralizedLehmerPool2d,
+                                    {'alpha': float(args.alpha), 'beta': float(args.beta),
+                                     'kernel_size': 2, 'stride': 2}],
+        'generalized_power_mean_pool': [GeneralizedPowerMeanPool2d,
+                                        {'gamma': float(args.gamma), 'delta': float(args.delta),
+                                         'kernel_size': 2, 'stride': 2}]
     }
 
-    pool = pools.get(args.pooling_type, nn.MaxPool2d(kernel_size=2, stride=2))
+    pool = pools.get(args.pooling_type, [nn.MaxPool2d, {
+                     'kernel_size': 2, 'stride': 2}])
     model = Net(pool)
 
     loss_func = torch.nn.CrossEntropyLoss()
