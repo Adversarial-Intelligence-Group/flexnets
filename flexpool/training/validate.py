@@ -40,7 +40,7 @@ def validate(epoch: int,
         if writer is not None:
             writer.add_scalar(
                 'val/iter_loss', loss.item(), global_step=global_step)
-            plot_poolings(model, writer, 'val/iter_pool', global_step)
+            plot_poolings(model, writer, 'val_pool', global_step)
 
     if writer is not None:
         loss_avg = loss_sum / len(val_loader)
