@@ -17,36 +17,36 @@ class Net(nn.Module):
                       kernel_size=3, padding=1),
 
             nn.BatchNorm2d(32),
-            nn.ReLU(inplace=True),
+            nn.LeakyReLU(0.3),
             nn.Conv2d(in_channels=32, out_channels=64,
                       kernel_size=3, padding=1),
-            nn.ReLU(inplace=True),
+            nn.LeakyReLU(0.3),
         )
         self.block2 = nn.Sequential(
             nn.Conv2d(in_channels=64, out_channels=128,
                       kernel_size=3, padding=1),
             nn.BatchNorm2d(128),
-            nn.ReLU(inplace=True),
+            nn.LeakyReLU(0.3),
             nn.Conv2d(in_channels=128, out_channels=128,
                       kernel_size=3, padding=1),
-            nn.ReLU(inplace=True),
+            nn.LeakyReLU(0.3),
         )
         self.drop2 = nn.Dropout2d(p=0.05)
         self.block3 = nn.Sequential(
             nn.Conv2d(in_channels=128, out_channels=256,
                       kernel_size=3, padding=1),
             nn.BatchNorm2d(256),
-            nn.ReLU(inplace=True),
+            nn.LeakyReLU(0.3),
             nn.Conv2d(in_channels=256, out_channels=256,
                       kernel_size=3, padding=1),
-            nn.ReLU(inplace=True),
+            nn.LeakyReLU(0.3),
         )
         self.fc_layer = nn.Sequential(
             nn.Dropout(p=0.1),
             nn.Linear(4096, 1024),
-            nn.ReLU(inplace=True),
+            nn.LeakyReLU(0.3),
             nn.Linear(1024, 512),
-            nn.ReLU(inplace=True),
+            nn.LeakyReLU(0.3),
             nn.Dropout(p=0.1),
             nn.Linear(512, 10)
         )

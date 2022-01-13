@@ -40,7 +40,6 @@ def validate(epoch: int,
         if writer is not None:
             writer.add_scalar(
                 'val/iter_loss', loss.item(), global_step=global_step)
-            plot_poolings(model, writer, 'val_pool', global_step)
 
     if writer is not None:
         loss_avg = loss_sum / len(val_loader)
@@ -50,6 +49,7 @@ def validate(epoch: int,
 
         writer.add_scalar('val/loss', loss_avg, global_step=epoch)
         writer.add_scalar('val/accuracy', accs_avg, global_step=epoch)
+        plot_poolings(model, writer, 'val_pool', global_step=epoch)
 
     # FIXME
     clip_poolings(model)

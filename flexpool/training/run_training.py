@@ -19,6 +19,9 @@ from .utils import load_checkpoint, save_checkpoint
 
 def run_training(args: Namespace):
     torch.manual_seed(args.seed)
+    np.random.seed(args.seed)
+    import random
+    random.seed(args.seed)
 
     device = torch.device(
         'cpu' if not torch.cuda.is_available() else args.device)
@@ -83,7 +86,7 @@ def run_training(args: Namespace):
             checkpoint_path = os.path.join(checkpoint_path, 'checkpoint.pth')
             save_checkpoint(checkpoint_path, model, optimizer, scheduler)
 
-    results_root = Path(args.save_dir).parent
+    # results_root = Path(args.save_dir).parent
     df = pd.DataFrame(data={
         'Device': [args.device],
         'Epochs': [args.epochs],
@@ -104,6 +107,7 @@ def run_training(args: Namespace):
                 module_types[name.split('.')[0]] is GeneralizedPowerMeanPool2d):
             df[name] = [p.data.item()]
 
-    save_path = os.path.join(results_root, args.run_id)
-    os.makedirs(save_path, exist_ok=True)
+    # save_path = os.path.join(results_root, args.run_id)
+    # os.makedirs(save_path, exist_ok=True)
+    save_path = args.save_dir
     df.to_json(os.path.join(save_path, 'final.json'), orient='records')

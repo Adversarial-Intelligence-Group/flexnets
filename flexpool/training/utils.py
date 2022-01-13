@@ -17,7 +17,7 @@ def accuracy(output: torch.Tensor, target: torch.Tensor, top_k=(1,)) -> Union[to
 
     res = []
     for k in top_k:
-        correct_k = correct[:k].view(-1).float().sum(0, keepdim=True)
+        correct_k = correct[:k].flatten().float().sum(0, keepdim=True)
         res.append(correct_k.mul_(100.0 / batch_size))
 
     if len(res) == 1:

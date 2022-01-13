@@ -6,11 +6,11 @@ from argparse import ArgumentParser, Namespace
 def add_train_args(parser: ArgumentParser):
     parser.add_argument('--run_id',
                         type=str,
-                        default='ex_2',
+                        default='ex_1',
                         help='Run ID')
     parser.add_argument('--pooling_type',
                         type=str,
-                        default='generalized_lehmer_pool',
+                        default='max_pool2d',
                         choices=['max_pool2d', 'generalized_lehmer_pool', 'generalized_power_mean_pool'])
     parser.add_argument('--device',
                         type=str,
@@ -60,8 +60,8 @@ def add_train_args(parser: ArgumentParser):
                         help='Number of epochs to run (default: 30)')
     parser.add_argument('--batch_size',
                         type=int,
-                        default=50,
-                        help='Batch size (default: 50)')
+                        default=64,
+                        help='Batch size (default: 64)')
     parser.add_argument('--lr',
                         type=float,
                         default=1e-4,
@@ -71,13 +71,13 @@ def add_train_args(parser: ArgumentParser):
 def add_glm_args(parser: ArgumentParser):
     parser.add_argument('--alpha',
                         type=float,
-                        default=1.5,
+                        default=2.5,
                         # min=1.0001,
                         # max=2.718,
                         help='Alpha parameter for GLP')
     parser.add_argument('--beta',
                         type=float,
-                        default=1.,
+                        default=1.3,
                         # min=-2.5,
                         # max=1.5,
                         help='Beta parameter for GLP')
@@ -86,13 +86,13 @@ def add_glm_args(parser: ArgumentParser):
 def add_gpm_args(parser: ArgumentParser):
     parser.add_argument('--gamma',
                         type=float,
-                        default=1.5,
+                        default=2.3,
                         # min=1.0001,
                         # max=2.718,
                         help='Alpha parameter for GPM')
     parser.add_argument('--delta',
                         type=float,
-                        default=1.,
+                        default=0.5,
                         # min=-2.5,
                         # max=1.5,
                         help='Beta parameter for GPM')
