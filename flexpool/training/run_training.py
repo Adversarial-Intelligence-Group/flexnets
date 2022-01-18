@@ -53,7 +53,7 @@ def run_training(args: Namespace):
     # optimizer = torch.optim.Adam(model.parameters(), lr=args.lr)
     optimizer = torch.optim.Adam([{"params": model.pool1.parameters(), "lr": 1e-2},
                                   {"params": model.pool2.parameters(), "lr": 1e-2},
-                                  {"params": model.pool2.parameters(), "lr": 1e-2},
+                                  {"params": model.pool3.parameters(), "lr": 1e-2},
                                   {"params": model.block1.parameters()},
                                   {"params": model.block2.parameters()},
                                   {"params": model.block3.parameters()},
