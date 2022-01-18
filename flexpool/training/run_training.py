@@ -1,26 +1,27 @@
 import os
+import random
 from argparse import Namespace
+from pathlib import Path
 from typing import Dict, List
 
-import torch
-import torch.nn as nn
-from torch.utils.tensorboard.writer import SummaryWriter
 import numpy as np
 import pandas as pd
-from pathlib import Path
-
-from flexpool.models import Net
-from .train import train
-from .validate import validate
+import torch
+import torch.nn as nn
 from flexpool.data import get_dataloaders
-from flexpool.nn.pooling import GeneralizedLehmerPool2d, GeneralizedPowerMeanPool2d
+from flexpool.models import Net
+from flexpool.nn.pooling import (GeneralizedLehmerPool2d,
+                                 GeneralizedPowerMeanPool2d)
+from torch.utils.tensorboard.writer import SummaryWriter
+
+from .train import train
 from .utils import freeze_poolings, load_checkpoint, save_checkpoint
+from .validate import validate
 
 
 def run_training(args: Namespace):
     torch.manual_seed(args.seed)
     np.random.seed(args.seed)
-    import random
     random.seed(args.seed)
 
     device = torch.device(
@@ -49,14 +50,25 @@ def run_training(args: Namespace):
     # freeze_poolings(model)
 
     loss_func = torch.nn.CrossEntropyLoss()
-    optimizer = torch.optim.Adam(model.parameters(), lr=args.lr)
+    # optimizer = torch.optim.Adam(model.parameters(), lr=args.lr)
+    optimizer = torch.optim.Adam([{"params": model.pool1.parameters(), "lr": 1e-2},
+                                  {"params": model.pool2.parameters(), "lr": 1e-2},
+                                  {"params": model.pool2.parameters(), "lr": 1e-2},
+                                  {"params": model.block1.parameters()},
+                                  {"params": model.block2.parameters()},
+                                  {"params": model.block3.parameters()},
+                                  {"params": model.drop2.parameters()},
+                                  {"params": model.fc_layer.parameters()},
+                                  ],
+                                 lr=args.lr)
+
     # FIXME gamma
     scheduler = torch.optim.lr_scheduler.StepLR(
         optimizer, step_size=len(train_loader), gamma=0.9)
 
     start_epoch = 0
     if args.checkpoint_path is not None:
-        start_epoch = 4 # FIXME
+        start_epoch = 4  # FIXME
         print(f'Loading model from {args.checkpoint_path}')
         model = load_checkpoint(
             args.checkpoint_path,
@@ -66,7 +78,6 @@ def run_training(args: Namespace):
             args.device == 'cuda'
         )
         # freeze_poolings(model)
-
 
     val_loss, val_accuracy = 0, 0
     train_loss, train_accuracy = 0, 0
