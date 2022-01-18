@@ -22,17 +22,22 @@ model_urls = {
 
 class VGG(nn.Module):
 
-    def __init__(self, features, num_classes=1000, init_weights=True):
+    def __init__(self, features, num_classes=2, init_weights=True):
         super(VGG, self).__init__()
         self.features = features
+        # self.classifier = nn.Sequential(
+        #     nn.Linear(512 * 7 * 7, 4096),
+        #     nn.ReLU(True),
+        #     nn.Dropout(),
+        #     nn.Linear(4096, 4096),
+        #     nn.ReLU(True),
+        #     nn.Dropout(),
+        #     nn.Linear(4096, num_classes),
+        # )
         self.classifier = nn.Sequential(
-            nn.Linear(512 * 7 * 7, 4096),
+            nn.Linear(256 * 7 * 7, 4096),
             nn.ReLU(True),
-            nn.Dropout(),
-            nn.Linear(4096, 4096),
-            nn.ReLU(True),
-            nn.Dropout(),
-            nn.Linear(4096, num_classes),
+            nn.Linear(4096, num_classes)
         )
         if init_weights:
             self._initialize_weights()
@@ -75,6 +80,8 @@ def make_layers(cfg, batch_norm=False):
 
 
 cfg = {
+
+    'A0': [32, 'M', 64, 'M', 128, 128, 'M', 256, 256, 'M', 256, 256, 'M'],
     'A': [64, 'M', 128, 'M', 256, 256, 'M', 512, 512, 'M', 512, 512, 'M'],
     'B': [64, 64, 'M', 128, 128, 'M', 256, 256, 'M', 512, 512, 'M', 512, 512, 'M'],
     'D': [64, 64, 'M', 128, 128, 'M', 256, 256, 256, 'M', 512, 512, 512, 'M', 512, 512, 512, 'M'],
@@ -89,7 +96,7 @@ def vgg11(pretrained=False, **kwargs):
     """
     if pretrained:
         kwargs['init_weights'] = False
-    model = VGG(make_layers(cfg['A']), **kwargs)
+    model = VGG(make_layers(cfg['A0']), **kwargs)
     if pretrained:
         model.load_state_dict(model_zoo.load_url(model_urls['vgg11']))
     return model
