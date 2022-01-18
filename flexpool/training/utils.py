@@ -40,6 +40,18 @@ def plot_poolings(model: nn.Module, writer: SummaryWriter, tag: str, global_step
                                   global_step=global_step)
 
 
+def freeze_poolings(model: nn.Module):
+    module_types = {key: type(module) for key, module in model.named_modules()}
+    for name, p in model.named_parameters():
+        if (module_types[name.split('.')[0]] is GeneralizedLehmerPool2d):
+            if ("alpha" in name) or ("beta" in name):
+                p.requires_grad = False
+
+        if (module_types[name.split('.')[0]] is GeneralizedPowerMeanPool2d):
+            if "gamma" in name or "delta" in name:
+                p.requires_grad = False
+
+
 def clip_poolings(model: nn.Module):
     module_types = {key: type(module) for key, module in model.named_modules()}
     for name, p in model.named_parameters():

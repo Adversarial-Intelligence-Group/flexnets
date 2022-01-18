@@ -14,7 +14,7 @@ from .train import train
 from .validate import validate
 from flexpool.data import get_dataloaders
 from flexpool.nn.pooling import GeneralizedLehmerPool2d, GeneralizedPowerMeanPool2d
-from .utils import load_checkpoint, save_checkpoint
+from .utils import freeze_poolings, load_checkpoint, save_checkpoint
 
 
 def run_training(args: Namespace):
@@ -45,6 +45,8 @@ def run_training(args: Namespace):
     pool = pools.get(args.pooling_type, [nn.MaxPool2d, {
                      'kernel_size': 2, 'stride': 2}])
     model = Net(pool)
+    model.to(device)
+    # freeze_poolings(model)
 
     loss_func = torch.nn.CrossEntropyLoss()
     optimizer = torch.optim.Adam(model.parameters(), lr=args.lr)
@@ -52,7 +54,9 @@ def run_training(args: Namespace):
     scheduler = torch.optim.lr_scheduler.StepLR(
         optimizer, step_size=len(train_loader), gamma=0.9)
 
+    start_epoch = 0
     if args.checkpoint_path is not None:
+        start_epoch = 4 # FIXME
         print(f'Loading model from {args.checkpoint_path}')
         model = load_checkpoint(
             args.checkpoint_path,
@@ -61,13 +65,13 @@ def run_training(args: Namespace):
             scheduler,
             args.device == 'cuda'
         )
+        # freeze_poolings(model)
 
-    model.to(device)
 
     val_loss, val_accuracy = 0, 0
     train_loss, train_accuracy = 0, 0
 
-    for epoch in range(0, args.epochs):
+    for epoch in range(start_epoch, start_epoch+args.epochs):
         train_losses, train_accs = train(epoch, model, train_loader, optimizer,
                                          scheduler, loss_func, writer)
         val_losses, val_accs = validate(
