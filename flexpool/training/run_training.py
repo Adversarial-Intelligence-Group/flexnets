@@ -51,16 +51,16 @@ def run_training(args: Namespace):
 
     loss_func = torch.nn.CrossEntropyLoss()
     # optimizer = torch.optim.Adam(model.parameters(), lr=args.lr)
-    optimizer = torch.optim.Adam([{"params": model.pool1.parameters(), "lr": 1e-2},
-                                  {"params": model.pool2.parameters(), "lr": 1e-2},
-                                  {"params": model.pool3.parameters(), "lr": 1e-2},
+    optimizer = torch.optim.Adam([{"params": model.pool1.parameters(), "lr": 0.00023},
+                                  {"params": model.pool2.parameters(), "lr": 0.00038},
+                                  {"params": model.pool3.parameters(), "lr": 0.00061},
                                   {"params": model.block1.parameters()},
                                   {"params": model.block2.parameters()},
                                   {"params": model.block3.parameters()},
                                   {"params": model.drop2.parameters()},
                                   {"params": model.fc_layer.parameters()},
                                   ],
-                                 lr=args.lr)
+                                 lr=1e-3)
 
     # FIXME gamma
     scheduler = torch.optim.lr_scheduler.StepLR(

@@ -56,7 +56,7 @@ def add_train_args(parser: ArgumentParser):
     # Training arguments
     parser.add_argument('--epochs',
                         type=int,
-                        default=30,
+                        default=25,
                         help='Number of epochs to run (default: 25)')
     parser.add_argument('--batch_size',
                         type=int,
