@@ -69,7 +69,8 @@ def make_layers(cfg, batch_norm=False):
     in_channels = 3
     for v in cfg:
         if v == 'M':
-            layers += [nn.MaxPool2d(kernel_size=2, stride=2)]
+            # layers += [nn.MaxPool2d(kernel_size=2, stride=2)]
+            layers += [GeneralizedLehmerPool2d(alpha=2.3, beta=1.1, kernel_size=2, stride=2)]
         else:
             conv2d = nn.Conv2d(in_channels, v, kernel_size=3, padding=1)
             if batch_norm:
@@ -110,7 +111,7 @@ def vgg11_bn(pretrained=False, **kwargs):
     """
     if pretrained:
         kwargs['init_weights'] = False
-    model = VGG(make_layers(cfg['A'], batch_norm=True), **kwargs)
+    model = VGG(make_layers(cfg['A0'], batch_norm=True), **kwargs)
     if pretrained:
         model.load_state_dict(model_zoo.load_url(model_urls['vgg11_bn']))
     return model

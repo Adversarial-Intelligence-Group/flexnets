@@ -15,7 +15,7 @@ from flexpool.nn.pooling import (GeneralizedLehmerPool2d,
 from torch.utils.tensorboard.writer import SummaryWriter
 
 from .train import train
-from .utils import freeze_poolings, load_checkpoint, save_checkpoint
+from .utils import freeze_poolings, load_checkpoint, plot_poolings, save_checkpoint
 from .validate import validate
 
 from torchvision.datasets import ImageFolder
@@ -42,8 +42,8 @@ def run_training(args: Namespace):
                                                                                    224, 224),
                                                                                tf.ToTensor()]))
     train_loader = DataLoader(
-        trainset, 16, True, drop_last=True, num_workers=6)
-    val_loader = DataLoader(valset, 16, False, drop_last=True, num_workers=6)
+        trainset, 8, True, drop_last=True, num_workers=6)
+    val_loader = DataLoader(valset, 8, False, drop_last=True, num_workers=6)
 
     # FIXME
     # pools: Dict[str, List] = {
@@ -60,8 +60,11 @@ def run_training(args: Namespace):
     # pool = pools.get(args.pooling_type, [nn.MaxPool2d, {
     #                  'kernel_size': 2, 'stride': 2}])
     # model = Net(pool)
-    from flexpool.models.vgg import vgg11
-    model = vgg11()
+    if args.pooling_type == 'max_pool2d':
+        from flexpool.models.vgg import vgg11
+    else:
+        from flexpool.models.vgglhm import vgg11
+    model = vgg11(True)
     model.to(device)
     # freeze_poolings(model)
 
@@ -112,8 +115,9 @@ def run_training(args: Namespace):
         val_accuracy += val_accs
 
         if args.save_dir is not None:
-            checkpoint_path = os.path.join(
-                args.save_dir, str(epoch))
+            # checkpoint_path = os.path.join(
+            #     args.save_dir, str(epoch))
+            checkpoint_path = args.save_dir
             os.makedirs(checkpoint_path, exist_ok=True)
             checkpoint_path = os.path.join(checkpoint_path, 'checkpoint.pth')
             save_checkpoint(checkpoint_path, model, optimizer, scheduler)
@@ -135,8 +139,10 @@ def run_training(args: Namespace):
 
     module_types = {key: type(module) for key, module in model.named_modules()}
     for name, p in model.named_parameters():
-        if (module_types[name.split('.')[0]] is GeneralizedLehmerPool2d or
-                module_types[name.split('.')[0]] is GeneralizedPowerMeanPool2d):
+        # if (module_types[name.split('.')[0]] is GeneralizedLehmerPool2d or
+        #         module_types[name.split('.')[0]] is GeneralizedPowerMeanPool2d):
+        if ((module_types['.'.join(name.split('.')[:-1])] is GeneralizedLehmerPool2d) or
+                (module_types['.'.join(name.split('.')[:-1])] is GeneralizedPowerMeanPool2d)):
             df[name] = [p.data.item()]
 
     # save_path = os.path.join(results_root, args.run_id)
