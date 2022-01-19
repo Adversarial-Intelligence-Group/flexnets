@@ -9,11 +9,11 @@ import numpy as np
 import pandas as pd
 from pathlib import Path
 
-from flexpool.models import Net
+from flexnets.models import Net
 from .train import train
 from .validate import validate
-from flexpool.data import get_dataloaders
-from flexpool.nn.pooling import GeneralizedLehmerPool2d, GeneralizedPowerMeanPool2d
+from flexnets.data import get_dataloaders
+from flexnets.nn.pooling import GeneralizedLehmerPool2d, GeneralizedPowerMeanPool2d
 from .utils import freeze_poolings, load_checkpoint, save_checkpoint
 
 

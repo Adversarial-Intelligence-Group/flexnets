@@ -1,7 +1,7 @@
 from setuptools import find_packages, setup
 
 setup(
-    name='flexpool',
+    name='flexnets',
     version='0.0.1',
     author='Vladyslav Branytskyi, Diana Malyk',
     author_email='vladyslav.branytskyi@nure.ua, diana.malyk@nure.ua',

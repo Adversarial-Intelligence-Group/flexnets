@@ -2,7 +2,7 @@ from typing import List, Union
 import torch
 import torch.nn as nn
 from torch.optim.lr_scheduler import _LRScheduler
-from flexpool.nn.pooling import GeneralizedLehmerPool2d, GeneralizedPowerMeanPool2d
+from flexnets.nn.pooling import GeneralizedLehmerPool2d, GeneralizedPowerMeanPool2d
 from torch.utils.tensorboard.writer import SummaryWriter
 
 

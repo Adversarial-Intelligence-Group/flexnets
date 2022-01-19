@@ -6,12 +6,12 @@ from torch.utils.tensorboard.writer import SummaryWriter
 from advertorch.attacks import LinfPGDAttack
 from tqdm import tqdm
 
-from flexpool.data import get_dataloaders
-from flexpool.models import Net
-from flexpool.nn.pooling import (GeneralizedLehmerPool2d,
+from flexnets.data import get_dataloaders
+from flexnets.models import Net
+from flexnets.nn.pooling import (GeneralizedLehmerPool2d,
                                  GeneralizedPowerMeanPool2d)
-from flexpool.parsing import parse_train_args
-from flexpool.training.utils import accuracy
+from flexnets.parsing import parse_train_args
+from flexnets.training.utils import accuracy
 import numpy as np
 import random
 
