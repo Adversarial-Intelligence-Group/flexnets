@@ -2,6 +2,7 @@ from typing import List, Union
 import torch
 import torch.nn as nn
 from torch.optim.lr_scheduler import _LRScheduler
+from flexnets.nn.gln import GeneralizedLehmerLayer
 from flexnets.nn.pooling import GeneralizedLehmerPool2d, GeneralizedPowerMeanPool2d
 from torch.utils.tensorboard.writer import SummaryWriter
 
@@ -55,7 +56,7 @@ def freeze_poolings(model: nn.Module):
 def clip_poolings(model: nn.Module):
     module_types = {key: type(module) for key, module in model.named_modules()}
     for name, p in model.named_parameters():
-        if (module_types[name.split('.')[0]] is GeneralizedLehmerPool2d):
+        if (module_types[name.split('.')[0]] is GeneralizedLehmerPool2d or module_types[name.split('.')[0]] is GeneralizedLehmerLayer):
             if "alpha" in name:
                 p.data = clip_data(p, 1.00001, 2.71828)
             if "beta" in name:
