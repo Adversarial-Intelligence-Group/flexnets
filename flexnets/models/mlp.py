@@ -14,13 +14,13 @@ class MLP(pl.LightningModule):
             # nn.Linear(in_features, 100),
             # nn.Linear(100, 100),
             # nn.Linear(100, 3)
-            GeneralizedLehmerLayer(in_features, 50),
+            GeneralizedLehmerLayer(in_features, 100),
             nn.ReLU(),
-            GeneralizedLehmerLayer(50, 50),
+            GeneralizedLehmerLayer(100, 100),
             nn.ReLU(),
-            GeneralizedLehmerLayer(50, 3)
+            GeneralizedLehmerLayer(100, 3)
         )
-        self.softmax = nn.Softmax(dim=1)
+        # self.softmax = nn.Softmax(dim=1)
         self.ce = nn.CrossEntropyLoss()
 
     def forward(self, x):

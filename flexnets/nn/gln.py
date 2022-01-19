@@ -43,5 +43,5 @@ class GeneralizedLehmerLayer(nn.Module):
         m = input.matmul(self.weight.t()) + self.bias
 
         a = (n + 1) / torch.log(self.alpha)
-        b = torch.log(self.alpha**((self.beta + 1) * m) / self.alpha**(self.beta * m))
+        b = torch.log(torch.pow(self.alpha, ((self.beta + 1) * m)) / torch.pow(self.alpha, (self.beta * m)))
         return a * b
