@@ -11,7 +11,9 @@ This project contains new types of pooling called Generalized Lehmer Pooling and
 ## Generalized Soft Plus
 Generalized Solft Plus is a universal trainable activation function. It can be found in `flexnets/nn/activation.py`.
 
-### Training a model
+## Generalized Lehmer Convolution
+
+## Training a model
 
 ## Citation
 
