@@ -1,6 +1,7 @@
 import torch
 from torch import Tensor, nn
 import torch.nn.functional as F
+from torch.nn.parameter import Parameter
 from torch.nn.modules.utils import _pair
 
 
@@ -11,7 +12,7 @@ class LehmerPool2d(nn.Module):
         self.stride = _pair(stride)
         self.padding = padding
         self.dilation = _pair(dilation)
-        self.k = nn.Parameter(torch.tensor(
+        self.k = Parameter(torch.tensor(
             k, dtype=torch.float64), requires_grad=True)
 
     def forward(self, input: Tensor) -> Tensor:
@@ -34,7 +35,7 @@ class SoftLehmerPool2d(nn.Module):
         self.stride = _pair(stride)
         self.padding = padding
         self.dilation = _pair(dilation)
-        self.k = nn.Parameter(torch.tensor(
+        self.k = Parameter(torch.tensor(
             k, dtype=torch.float64), requires_grad=True)
 
     def forward(self, input: Tensor) -> Tensor:
@@ -56,9 +57,9 @@ class GeneralizedLehmerPool2d(nn.Module):
         self.stride = _pair(stride)
         self.padding = padding
         self.dilation = _pair(dilation)
-        self.alpha = nn.Parameter(torch.tensor(
+        self.alpha = Parameter(torch.tensor(
             alpha, dtype=torch.float64, requires_grad=True))
-        self.beta = nn.Parameter(torch.tensor(
+        self.beta = Parameter(torch.tensor(
             beta, dtype=torch.float64, requires_grad=True))
 
     def forward(self, input: Tensor) -> Tensor:
@@ -81,9 +82,9 @@ class GeneralizedPowerMeanPool2d(nn.Module):
         self.stride = _pair(stride)
         self.padding = padding
         self.dilation = _pair(dilation)
-        self.gamma = nn.Parameter(torch.tensor(
+        self.gamma = Parameter(torch.tensor(
             gamma, dtype=torch.float64, requires_grad=True))
-        self.delta = nn.Parameter(torch.tensor(
+        self.delta = Parameter(torch.tensor(
             delta, dtype=torch.float64, requires_grad=True))
 
     def forward(self, input: Tensor) -> Tensor:

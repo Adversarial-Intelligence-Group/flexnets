@@ -10,9 +10,9 @@ class GeneralizedSoftPlus(nn.Module):
 
     def __init__(self, alpha: float = 2.718, beta: float = 1.5) -> None:
         super(GeneralizedSoftPlus, self).__init__()
-        self.alpha = nn.Parameter(torch.tensor(
+        self.alpha = Parameter(torch.tensor(
             alpha, dtype=torch.float64), requires_grad=True)
-        self.beta = nn.Parameter(torch.tensor(
+        self.beta = Parameter(torch.tensor(
             beta, dtype=torch.float64), requires_grad=True)
 
     def forward(self, input: Tensor) -> Tensor:
