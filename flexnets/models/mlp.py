@@ -3,7 +3,7 @@ import torch.nn as nn
 import pytorch_lightning as pl
 import torchmetrics
 
-from flexnets.nn.gln import GeneralizedLehmerLayer
+from flexnets.nn.layers import GeneralizedLehmerLayer
 from flexnets.training.utils import clip_poolings
 
 
