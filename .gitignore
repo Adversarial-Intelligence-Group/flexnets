@@ -202,4 +202,5 @@ $RECYCLE.BIN/
 /_trash
 /.vscode
 /_assets
-.assets
+/.assets
+/lightning_logs
