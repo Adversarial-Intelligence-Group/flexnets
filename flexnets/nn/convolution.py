@@ -48,9 +48,9 @@ class GeneralizedLehmerConvolution(torch.nn.modules.conv._ConvNd):
 
         output_shape = ((x.shape[2] - self.kernel_size[0])//self.stride[0] + 1,
                         (x.shape[3] - self.kernel_size[1])//self.stride[1] + 1)
-        n = torch.tensor([1.]) # FIXME what is n?
         # x: torch.Size([64, 3, 34, 34]) 3 -> 32 ch
         x = F.unfold(input=x, kernel_size=self.kernel_size, dilation=self.dilation, stride=self.stride)  # torch.Size([64, 27, 1024])
+        n = torch.tensor(x.shape[2])
         multiplier = n/torch.log(self.alpha)
         dotprod = x.transpose(1, 2).matmul(weight.reshape(weight.shape[0], -1).t()).transpose(1, 2) #torch.Size([64, 32, 1024])
         numerator = torch.pow(self.alpha, (self.beta+1)*dotprod)
@@ -102,7 +102,7 @@ class GeneralizedPowerConvolution(torch.nn.modules.conv._ConvNd):
 
         output_shape = ((x.shape[2] - self.kernel_size[0])//self.stride[0] + 1,
                         (x.shape[3] - self.kernel_size[1])//self.stride[1] + 1)
-        n = torch.tensor([1.]) # FIXME what is n?
+        n = torch.tensor(x.shape[2])
         # x: torch.Size([64, 3, 34, 34]) 3 -> 32 ch
         x = F.unfold(input=x, kernel_size=self.kernel_size, dilation=self.dilation, stride=self.stride)  # torch.Size([64, 27, 1024])
         multiplier = n/(self.delta*torch.log(self.gamma))
