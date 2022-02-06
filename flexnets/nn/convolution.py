@@ -7,7 +7,7 @@ from torch.nn.modules.utils import _pair
 from torch.nn.common_types import _size_2_t
 from typing import Optional, Union
 
-
+'''
 class LehmerConv2d(torch.nn.modules.conv._ConvNd):
     def __init__(
         self,
@@ -102,6 +102,8 @@ class SoftLehmerConv2d(torch.nn.modules.conv._ConvNd):
     def forward(self, input: Tensor) -> Tensor:
         return self._conv_forward(input, self.weight, self.bias)
 
+'''
+
 
 class GeneralizedLehmerConvolution(torch.nn.modules.conv._ConvNd):
 
@@ -124,7 +126,7 @@ class GeneralizedLehmerConvolution(torch.nn.modules.conv._ConvNd):
         stride_ = _pair(stride)
         padding_ = padding if isinstance(padding, str) else _pair(padding)
         dilation_ = _pair(dilation)
-        super(SoftLehmerConv2d, self).__init__(
+        super(GeneralizedLehmerConvolution, self).__init__(
             in_channels, out_channels, kernel_size_, stride_, padding_, dilation_,
             False, _pair(0), groups, bias, padding_mode)
         #FIXME
@@ -154,8 +156,7 @@ class GeneralizedLehmerConvolution(torch.nn.modules.conv._ConvNd):
         denominator = torch.pow(self.alpha, self.beta*dotprod).transpose(1, 2)
         # FIXME numerator should be multiplied by n, but what is n?
         x = torch.log(numerator/denominator)/torch.log(self.alpha)  # torch.Size([32, 10, 576]) 
-        # torch.Size([32, 10, 24, 24])
-        x = x.reshape(input.shape[0], self.out_channels, *output_shape)
+        x = x.reshape(input.shape[0], self.out_channels, *output_shape) # torch.Size([32, 10, 24, 24])
         return x
 
 
@@ -180,7 +181,7 @@ class GeneralizedPowerConvolution(torch.nn.modules.conv._ConvNd):
         stride_ = _pair(stride)
         padding_ = padding if isinstance(padding, str) else _pair(padding)
         dilation_ = _pair(dilation)
-        super(SoftLehmerConv2d, self).__init__(
+        super(GeneralizedPowerConvolution, self).__init__(
             in_channels, out_channels, kernel_size_, stride_, padding_, dilation_,
             False, _pair(0), groups, bias, padding_mode)
         #FIXME

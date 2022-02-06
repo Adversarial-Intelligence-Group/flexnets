@@ -18,10 +18,6 @@ from .utils import freeze_poolings, load_checkpoint, save_checkpoint
 
 
 def run_training(args: Namespace):
-    torch.manual_seed(args.seed)
-    np.random.seed(args.seed)
-    import random
-    random.seed(args.seed)
 
     device = torch.device(
         'cpu' if not torch.cuda.is_available() else args.device)
