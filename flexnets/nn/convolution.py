@@ -127,8 +127,11 @@ class GeneralizedLehmerConvolution(torch.nn.modules.conv._ConvNd):
         super(SoftLehmerConv2d, self).__init__(
             in_channels, out_channels, kernel_size_, stride_, padding_, dilation_,
             False, _pair(0), groups, bias, padding_mode)
-        # TODO #FIXME
+        #FIXME
         # self.k = nn.Parameter(torch.tensor(0.), requires_grad=False)
+        # TODO 
+        self.alpha = nn.Parameter(torch.tensor(0.), requires_grad=False)
+        self.beta = nn.Parameter(torch.tensor(0.), requires_grad=False)
 
     def forward(self, input: Tensor) -> Tensor:
         return self._conv_forward(input, self.weight, self.bias)
@@ -179,8 +182,11 @@ class GeneralizedPowerConvolution(torch.nn.modules.conv._ConvNd):
         super(SoftLehmerConv2d, self).__init__(
             in_channels, out_channels, kernel_size_, stride_, padding_, dilation_,
             False, _pair(0), groups, bias, padding_mode)
-        # TODO #FIXME
+        #FIXME
         # self.k = nn.Parameter(torch.tensor(0.), requires_grad=False)
+        # TODO 
+        self.delta = nn.Parameter(torch.tensor(0.), requires_grad=False)
+        self.gamma = nn.Parameter(torch.tensor(0.), requires_grad=False)
 
     def forward(self, input: Tensor) -> Tensor:
         return self._conv_forward(input, self.weight, self.bias)
