@@ -147,12 +147,13 @@ class GeneralizedLehmerConvolution(torch.nn.modules.conv._ConvNd):
 
         output_shape = ((x.shape[2] - self.kernel_size[0])//self.stride[0] + 1,
                         (x.shape[3] - self.kernel_size[1])//self.stride[1] + 1)
-        # TODO #FIXME
-        # x = F.unfold(x, self.kernel_size, self.dilation,
-        #              self.padding, self.stride)  # torch.Size([32, 25, 576])
-        # x = torch.log((torch.exp(x*(self.k+1)).transpose(1, 2).matmul(weight.reshape(weight.size(
-        #     0), -1).t()).transpose(1, 2)/torch.exp(x*self.k).transpose(1, 2).matmul(weight.reshape(weight.size(
-        #         0), -1).t()).transpose(1, 2)))  # torch.Size([32, 10, 576]) # FIXME I think that *n is redundant
+        x = F.unfold(x, self.kernel_size, self.dilation,
+                     self.padding, self.stride)  # torch.Size([32, 25, 576])
+        dotprod = x.matmul(weight.reshape(weight.shape[0], -1).t()).transpose(1, 2)
+        numerator = torch.pow(self.alpha, (self.beta+1)*dotprod).transpose(1, 2)
+        denominator = torch.pow(self.alpha, self.beta*dotprod).transpose(1, 2)
+        # FIXME numerator should be multiplied by n, but what is n?
+        x = torch.log(numerator/denominator)/torch.log(self.alpha)  # torch.Size([32, 10, 576]) 
         # torch.Size([32, 10, 24, 24])
         x = x.reshape(input.shape[0], self.out_channels, *output_shape)
         return x
