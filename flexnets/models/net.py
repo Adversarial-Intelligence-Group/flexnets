@@ -56,6 +56,6 @@ class Net(nn.Module):
         x = self.pool1(self.block1(x))
         x = self.drop2(self.pool2(self.block2(x)))
         x = self.pool3(self.block3(x))
-        x = x.view(x.size(0), -1)
+        x = x.reshape(x.shape[0], -1)
         x = self.fc_layer(x)
         return x

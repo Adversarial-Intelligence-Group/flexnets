@@ -48,13 +48,14 @@ class GeneralizedLehmerConvolution(torch.nn.modules.conv._ConvNd):
 
         output_shape = ((x.shape[2] - self.kernel_size[0])//self.stride[0] + 1,
                         (x.shape[3] - self.kernel_size[1])//self.stride[1] + 1)
+        n = torch.tensor([1.]) # FIXME what is n?
         # x: torch.Size([64, 3, 34, 34]) 3 -> 32 ch
         x = F.unfold(input=x, kernel_size=self.kernel_size, dilation=self.dilation, stride=self.stride)  # torch.Size([64, 27, 1024])
-        dotprod = x.transpose(1, 2).matmul(weight.reshape(weight.size(0), -1).t()).transpose(1, 2) #torch.Size([64, 32, 1024])
+        multiplier = n/torch.log(self.alpha)
+        dotprod = x.transpose(1, 2).matmul(weight.reshape(weight.shape[0], -1).t()).transpose(1, 2) #torch.Size([64, 32, 1024])
         numerator = torch.pow(self.alpha, (self.beta+1)*dotprod)
         denominator = torch.pow(self.alpha, self.beta*dotprod)
-        # FIXME numerator should be multiplied by n, but what is n?
-        x = torch.log(numerator/denominator)/torch.log(self.alpha)  #torch.Size([64, 32, 1024])
+        x = multiplier*torch.log(numerator/denominator)  #torch.Size([64, 32, 1024])
         x = x.reshape(input.shape[0], self.out_channels, *output_shape) # torch.Size([64, 32, 32, 32])
         return x
 
@@ -101,13 +102,13 @@ class GeneralizedPowerConvolution(torch.nn.modules.conv._ConvNd):
 
         output_shape = ((x.shape[2] - self.kernel_size[0])//self.stride[0] + 1,
                         (x.shape[3] - self.kernel_size[1])//self.stride[1] + 1)
-        # TODO #FIXME
-        # x = F.unfold(x, self.kernel_size, self.dilation,
-        #              self.padding, self.stride)  # torch.Size([32, 25, 576])
-        # x = torch.log((torch.exp(x*(self.k+1)).transpose(1, 2).matmul(weight.reshape(weight.size(
-        #     0), -1).t()).transpose(1, 2)/torch.exp(x*self.k).transpose(1, 2).matmul(weight.reshape(weight.size(
-        #         0), -1).t()).transpose(1, 2)))  # torch.Size([32, 10, 576]) # FIXME I think that *n is redundant
-        # torch.Size([32, 10, 24, 24])
-        x = x.reshape(input.shape[0], self.out_channels, *output_shape)
+        n = torch.tensor([1.]) # FIXME what is n?
+        # x: torch.Size([64, 3, 34, 34]) 3 -> 32 ch
+        x = F.unfold(input=x, kernel_size=self.kernel_size, dilation=self.dilation, stride=self.stride)  # torch.Size([64, 27, 1024])
+        multiplier = n/(self.delta*torch.log(self.gamma))
+        dotprod = x.transpose(1, 2).matmul(weight.reshape(weight.shape[0], -1).t()).transpose(1, 2) #torch.Size([64, 32, 1024])
+        dotprod_yd = torch.log(torch.pow(self.gamma, self.delta*dotprod)) - torch.log(n)
+        x = multiplier*dotprod_yd #torch.Size([64, 32, 1024])
+        x = x.reshape(input.shape[0], self.out_channels, *output_shape) # torch.Size([64, 32, 32, 32])
         return x
 
