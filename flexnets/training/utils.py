@@ -30,15 +30,15 @@ def accuracy(output: torch.Tensor, target: torch.Tensor, top_k=(1,)) -> Union[to
 def plot_poolings(model: nn.Module, writer: SummaryWriter, tag: str, global_step: int):
     module_types = {key: type(module) for key, module in model.named_modules()}
     for name, p in model.named_parameters():
-        if (module_types[name.split('.')[0]] is GeneralizedLehmerPool2d):
-            if ("alpha" in name) or ("beta" in name):
-                writer.add_scalar(tag+'/'+name, p.data.item(),
-                                  global_step=global_step)
+        # if (module_types[name.split('.')[0]] is GeneralizedLehmerPool2d):
+        if ("alpha" in name) or ("beta" in name):
+            writer.add_scalar(tag+'/'+name, p.data.item(),
+                                global_step=global_step)
 
-        if (module_types[name.split('.')[0]] is GeneralizedPowerMeanPool2d):
-            if ("gamma" in name) or ("delta" in name):
-                writer.add_scalar(tag+'/'+name, p.data.item(),
-                                  global_step=global_step)
+        # if (module_types[name.split('.')[0]] is GeneralizedPowerMeanPool2d):
+        if ("gamma" in name) or ("delta" in name):
+            writer.add_scalar(tag+'/'+name, p.data.item(),
+                                global_step=global_step)
 
 
 def freeze_poolings(model: nn.Module):
