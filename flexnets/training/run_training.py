@@ -14,7 +14,7 @@ from .train import train
 from .validate import validate
 from flexnets.data import get_dataloaders
 from flexnets.nn.pooling import GeneralizedLehmerPool2d, GeneralizedPowerMeanPool2d
-from .utils import freeze_poolings, load_checkpoint, save_checkpoint
+from .utils import freeze_poolings, load_checkpoint, save_checkpoint, get_parameters
 
 
 def run_training(args: Namespace):
@@ -45,7 +45,7 @@ def run_training(args: Namespace):
     # freeze_poolings(model)
 
     loss_func = torch.nn.CrossEntropyLoss()
-    optimizer = torch.optim.Adam(model.parameters(), lr=args.lr)
+    optimizer = torch.optim.Adam(get_parameters(model), lr=args.lr)
     # FIXME gamma
     scheduler = torch.optim.lr_scheduler.StepLR(
         optimizer, step_size=len(train_loader), gamma=0.9)

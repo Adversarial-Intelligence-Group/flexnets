@@ -52,6 +52,14 @@ def freeze_poolings(model: nn.Module):
             if "gamma" in name or "delta" in name:
                 p.requires_grad = False
 
+def get_parameters(model: nn.Module, default_lr, other_lr):
+    parameters = {}
+    for name, p in model.named_parameters():
+        if (("alpha" in name) or ("beta" in name) or 
+            ("gamma" in name or "delta" in name)):
+            parameters
+        else:
+
 
 def clip_poolings(model: nn.Module):
     module_types = {key: type(module) for key, module in model.named_modules()}
@@ -67,6 +75,8 @@ def clip_poolings(model: nn.Module):
                 p.data = clip_data(p, 1.00001, 2.71828)
             if "delta" in name:
                 p.data = clip_data(p, -2.5, 1.5)
+
+
 
 
 def clip_data(parameters: torch.Tensor, min_clip_value: float, max_clip_value: float) -> torch.Tensor:
