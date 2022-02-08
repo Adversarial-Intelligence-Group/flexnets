@@ -1,4 +1,4 @@
-from typing import List, Union
+from typing import Dict, List, Union
 import torch
 import torch.nn as nn
 from torch.optim.lr_scheduler import _LRScheduler
@@ -52,13 +52,17 @@ def freeze_poolings(model: nn.Module):
             if "gamma" in name or "delta" in name:
                 p.requires_grad = False
 
-def get_parameters(model: nn.Module, default_lr, other_lr):
-    parameters = {}
+def get_parameters(model: nn.Module) -> List[Dict]:
+    parameters = []
+    # TODO
+    other_lr = 0.01
     for name, p in model.named_parameters():
         if (("alpha" in name) or ("beta" in name) or 
             ("gamma" in name or "delta" in name)):
-            parameters
+            parameters.append({"params": p, "lr": other_lr})
         else:
+            parameters.append({"params": p})
+    return parameters
 
 
 def clip_poolings(model: nn.Module):
