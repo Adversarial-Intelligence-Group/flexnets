@@ -1,6 +1,6 @@
 from typing import List
 import torch.nn as nn
-from flexnets.nn import GeneralizedLehmerConvolution as Conv2d
+from flexnets.nn import GeneralizedLehmerConvolution as Conv2d # FIXME
 
 
 class Net(nn.Module):
