@@ -1,5 +1,6 @@
 import os
 from argparse import Namespace
+from pickletools import optimize
 from typing import Dict, List
 
 import torch
@@ -14,7 +15,7 @@ from .train import train
 from .validate import validate
 from flexnets.data import get_dataloaders
 from flexnets.nn.pooling import GeneralizedLehmerPool2d, GeneralizedPowerMeanPool2d
-from .utils import freeze_poolings, load_checkpoint, save_checkpoint, get_parameters
+from .utils import freeze_other_params, freeze_poolings, load_checkpoint, save_checkpoint, get_parameters
 
 
 def run_training(args: Namespace):
@@ -45,7 +46,8 @@ def run_training(args: Namespace):
     # freeze_poolings(model)
 
     loss_func = torch.nn.CrossEntropyLoss()
-    optimizer = torch.optim.Adam(get_parameters(model), lr=args.lr)
+    optimizer = torch.optim.SGD(get_parameters(model, args.lr), lr=args.lr)
+    # optimizer = torch.optim.Adam(get_parameters(model, args.lr), lr=args.lr)
     # optimizer = torch.optim.Adam([{"params": model.pool1.parameters(), "lr": 0.00023},
     #                               {"params": model.pool2.parameters(), "lr": 0.00038},
     #                               {"params": model.pool3.parameters(), "lr": 0.00061},
@@ -62,7 +64,7 @@ def run_training(args: Namespace):
 
     start_epoch = 0
     if args.checkpoint_path is not None:
-        start_epoch = 4 # FIXME
+        start_epoch = 15 # FIXME
         print(f'Loading model from {args.checkpoint_path}')
         model = load_checkpoint(
             args.checkpoint_path,
@@ -71,7 +73,10 @@ def run_training(args: Namespace):
             scheduler,
             args.device == 'cuda'
         )
-        # freeze_poolings(model)
+    freeze_other_params(model)
+    optimizer = torch.optim.SGD(filter(lambda p: p.requires_grad, model.parameters()), lr=0.01)
+    scheduler = torch.optim.lr_scheduler.StepLR(
+        optimizer, step_size=len(train_loader), gamma=0.9)
 
 
     val_loss, val_accuracy = 0, 0
