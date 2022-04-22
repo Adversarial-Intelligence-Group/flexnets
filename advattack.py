@@ -27,7 +27,7 @@ if __name__ == "__main__":
 
     train_loader, val_loader, test_loader = get_dataloaders(args)
 
-    writer = SummaryWriter('./.assets/attack_logs/ex2_lehmer')
+    writer = SummaryWriter('./.assets/attack_logs/ex1_max_pool_pgd')
 
     pools: Dict[str, List] = {
         'max_pool2d': [nn.MaxPool2d,
@@ -45,12 +45,14 @@ if __name__ == "__main__":
     model = Net(pool)
     model.eval()
 
-    path = "/home/diana/Projects/other/LehmerFlex/flexpool/.assets/checkpoints/ex_3_220112-234451108445_generalized_lehmer_pool/29/checkpoint.pth"
+    path = ".assets/checkpoints/ex_ .pth"
     state = torch.load(path)
     model.load_state_dict(state['model'])
     model.cuda()
 
-    epsilons = [0.0001, 0.0005, 0.001, 0.005, 0.008, 0.01, 0.015, 0.02]
+    # epsilons = [0.0001, 0.0005, 0.001, 0.005, 0.008, 0.01, 0.015, 0.02]
+    epsilons = np.linspace(0.0001, 0.025, 10)
+    print(epsilons)
     for epoch, eps in enumerate(epsilons):
         writer.add_scalar('pgd/eps', eps, global_step=epoch)
         adversary = LinfPGDAttack(
@@ -59,7 +61,7 @@ if __name__ == "__main__":
             targeted=False)
 
         clean_accuracy, adv_accuracy = 0, 0
-        pbar = tqdm(val_loader)
+        pbar = tqdm(test_loader)
         for idx, (cln_data, true_labels) in enumerate(pbar):
             cln_data, true_labels = cln_data.to(device), true_labels.to(device)
 
@@ -92,15 +94,18 @@ if __name__ == "__main__":
                     'pgd/3_clean_acc', acc3.item(), global_step=global_step)
                 writer.add_scalar(
                     'pgd/3_adv_acc', advacc3.item(), global_step=global_step)
-                if idx % 250 == 0:
-                    writer.add_images('images/clean', cln_data.detach().cpu().numpy(), global_step)
-                    writer.add_images('images/adv', adv_data.detach().cpu().numpy(), global_step)
                 pbar.set_description(f"Acc: {clean_acc.item()}, AdvAcc: {adv_acc.item()}")
+
+        
+        writer.add_scalar(
+            'pgd/final_clean',clean_accuracy/len(val_loader), global_step=epoch)
+        writer.add_scalar(
+            'pgd/final_adv', adv_accuracy/len(val_loader), global_step=epoch)
+
 
         print("Clean accuracy: ", clean_accuracy/len(val_loader))
         print("adversarial accuracy: ", adv_accuracy/len(val_loader))
 
-        writer.add_scalar(
-            'pgd/final_clean', clean_accuracy/len(val_loader), global_step=epoch)
-        writer.add_scalar(
-            'pgd/final_adv', adv_accuracy/len(val_loader), global_step=epoch)
+
+        # writer.add_images('images/clean', cln_data.detach().cpu().numpy(), epoch)
+        # writer.add_images('images/adv', adv_data.detach().cpu().numpy(), epoch)
