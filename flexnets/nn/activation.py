@@ -16,7 +16,7 @@ class GeneralizedSoftPlus(nn.Module):
             beta, dtype=torch.float64), requires_grad=True)
 
     def forward(self, input: Tensor) -> Tensor:
-        return torch.log(1 + self.alpha ** (self.beta * input)) / (self.beta * torch.log(self.alpha))
+        return torch.log(1 + torch.pow(self.alpha, (self.beta * input))) / (self.beta * torch.log(self.alpha))
 
     def extra_repr(self) -> str:
         return 'beta={}, alpha={}'.format(self.beta, self.alpha)

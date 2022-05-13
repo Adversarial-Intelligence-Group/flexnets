@@ -13,7 +13,7 @@ from flexnets.models import Net
 from .train import train
 from .validate import validate
 from flexnets.data import get_dataloaders
-from flexnets.nn.pooling import GeneralizedLehmerPool2d, GeneralizedPowerMeanPool2d
+from flexnets.nn.pooling import GeneralizedLehmerPool2d, GeneralizedPowerMeanPool2d, LPPool2d
 from .utils import freeze_poolings, load_checkpoint, save_checkpoint
 
 
@@ -39,7 +39,9 @@ def run_training(args: Namespace):
                                      'kernel_size': 2, 'stride': 2}],
         'generalized_power_mean_pool': [GeneralizedPowerMeanPool2d,
                                         {'gamma': float(args.gamma), 'delta': float(args.delta),
-                                         'kernel_size': 2, 'stride': 2}]
+                                         'kernel_size': 2, 'stride': 2}],
+        "lp_pool": [LPPool2d,
+                       {'norm_type': args.norm_type, 'kernel_size': 2, 'stride': 2}]
     }
 
     pool = pools.get(args.pooling_type, [nn.MaxPool2d, {
@@ -52,11 +54,11 @@ def run_training(args: Namespace):
     optimizer = torch.optim.Adam(model.parameters(), lr=args.lr)
     # FIXME gamma
     scheduler = torch.optim.lr_scheduler.StepLR(
-        optimizer, step_size=len(train_loader), gamma=0.9)
+        optimizer, step_size=1, gamma=0.9)
 
     start_epoch = 0
     if args.checkpoint_path is not None:
-        start_epoch = 4 # FIXME
+        start_epoch = 10 # FIXME
         print(f'Loading model from {args.checkpoint_path}')
         model = load_checkpoint(
             args.checkpoint_path,
@@ -71,11 +73,16 @@ def run_training(args: Namespace):
     val_loss, val_accuracy = 0, 0
     train_loss, train_accuracy = 0, 0
 
+    best_val_loss = 100
+    best_counter = 0
+
     for epoch in range(start_epoch, start_epoch+args.epochs):
         train_losses, train_accs = train(epoch, model, train_loader, optimizer,
-                                         scheduler, loss_func, writer)
+                                         None, loss_func, writer)
         val_losses, val_accs = validate(
             epoch, model, val_loader, loss_func, writer)
+        scheduler.step()
+
         writer.flush()
 
         train_loss += train_losses
@@ -89,6 +96,15 @@ def run_training(args: Namespace):
             os.makedirs(checkpoint_path, exist_ok=True)
             checkpoint_path = os.path.join(checkpoint_path, 'checkpoint.pth')
             save_checkpoint(checkpoint_path, model, optimizer, scheduler)
+        
+        if best_val_loss >= (val_losses/len(val_loader)):
+            best_val_loss = (val_losses/len(val_loader))
+            best_counter = 0
+        else:
+            best_counter += 1
+        
+        if best_counter == 5:
+            break
 
     # results_root = Path(args.save_dir).parent
     df = pd.DataFrame(data={

@@ -11,7 +11,7 @@ def add_train_args(parser: ArgumentParser):
     parser.add_argument('--pooling_type',
                         type=str,
                         default='max_pool2d',
-                        choices=['max_pool2d', 'generalized_lehmer_pool', 'generalized_power_mean_pool'])
+                        choices=['max_pool2d', 'generalized_lehmer_pool', 'generalized_power_mean_pool', 'lp_pool'])
     parser.add_argument('--device',
                         type=str,
                         choices=['cuda', 'cpu'],
@@ -81,6 +81,13 @@ def add_glm_args(parser: ArgumentParser):
                         # min=-2.5,
                         # max=1.5,
                         help='Beta parameter for GLP')
+
+    parser.add_argument('--norm_type',
+                        type=float,
+                        default=2,
+                        # min=1,
+                        # max=4,
+                        help='Norm type parameter for LP')
 
 
 def add_gpm_args(parser: ArgumentParser):
