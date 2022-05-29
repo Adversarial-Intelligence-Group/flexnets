@@ -30,15 +30,17 @@ def accuracy(output: torch.Tensor, target: torch.Tensor, top_k=(1,)) -> Union[to
 def plot_poolings(model: nn.Module, writer: SummaryWriter, tag: str, global_step: int):
     module_types = {key: type(module) for key, module in model.named_modules()}
     for name, p in model.named_parameters():
-        if (module_types[name.split('.')[0]] is GeneralizedLehmerPool2d):
+        # if (module_types[name.split('.')[0]] is GeneralizedLehmerPool2d):
+        if (module_types['.'.join(name.split('.')[:-1])] is GeneralizedLehmerPool2d):
             if ("alpha" in name) or ("beta" in name):
                 writer.add_scalar(tag+'/'+name, p.data.item(),
-                                  global_step=global_step)
+                                    global_step=global_step)
 
-        if (module_types[name.split('.')[0]] is GeneralizedPowerMeanPool2d):
+        # if (module_types[name.split('.')[0]] is GeneralizedPowerMeanPool2d):
+        if (module_types['.'.join(name.split('.')[:-1])] is GeneralizedPowerMeanPool2d):
             if ("gamma" in name) or ("delta" in name):
                 writer.add_scalar(tag+'/'+name, p.data.item(),
-                                  global_step=global_step)
+                                    global_step=global_step)
 
 
 def freeze_poolings(model: nn.Module):
@@ -62,7 +64,8 @@ def clip_poolings(model: nn.Module):
             if "beta" in name:
                 p.data = clip_data(p, -2.5, 1.5)
 
-        if (module_types[name.split('.')[0]] is GeneralizedPowerMeanPool2d):
+        # if (module_types[name.split('.')[0]] is GeneralizedPowerMeanPool2d):
+        if (module_types['.'.join(name.split('.')[:-1])] is GeneralizedPowerMeanPool2d):
             if "gamma" in name:
                 p.data = clip_data(p, 1.00001, 2.71828)
             if "delta" in name:

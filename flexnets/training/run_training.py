@@ -16,11 +16,16 @@ from torch.utils.tensorboard.writer import SummaryWriter
 
 from flexnets.models import Net
 from .train import train
+from .utils import freeze_poolings, load_checkpoint, plot_poolings, save_checkpoint
 from .validate import validate
 from flexnets.data import get_dataloaders
 from flexnets.nn.pooling import GeneralizedLehmerPool2d, GeneralizedPowerMeanPool2d
 from .utils import freeze_poolings, load_checkpoint, save_checkpoint
 from .validate import validate
+
+from torchvision.datasets import ImageFolder
+from torch.utils.data import DataLoader
+import torchvision.transforms as tf
 
 
 def run_training(args: Namespace):
@@ -33,42 +38,58 @@ def run_training(args: Namespace):
 
     writer = SummaryWriter(args.logs_dir)
 
-    train_loader, val_loader, test_loader = get_dataloaders(args)
+    trainset = ImageFolder('./.assets/data/catsdogs/train/', transform=tf.Compose([tf.Resize(256),
+                                                                                   tf.RandomCrop(
+                                                                                       224, 224),
+                                                                                   tf.ToTensor()]))
+    valset = ImageFolder('./.assets/data/catsdogs/val/', transform=tf.Compose([tf.Resize(256),
+                                                                               tf.RandomCrop(
+                                                                                   224, 224),
+                                                                               tf.ToTensor()]))
+    train_loader = DataLoader(
+        trainset, 8, True, drop_last=True, num_workers=6)
+    val_loader = DataLoader(valset, 8, False, drop_last=True, num_workers=6)
 
     # FIXME
-    pools: Dict[str, List] = {
-        'max_pool2d': [nn.MaxPool2d,
-                       {'kernel_size': 2, 'stride': 2}],
-        'generalized_lehmer_pool': [GeneralizedLehmerPool2d,
-                                    {'alpha': float(args.alpha), 'beta': float(args.beta),
-                                     'kernel_size': 2, 'stride': 2}],
-        'generalized_power_mean_pool': [GeneralizedPowerMeanPool2d,
-                                        {'gamma': float(args.gamma), 'delta': float(args.delta),
-                                         'kernel_size': 2, 'stride': 2}]
-    }
+    # pools: Dict[str, List] = {
+    #     'max_pool2d': [nn.MaxPool2d,
+    #                    {'kernel_size': 2, 'stride': 2}],
+    #     'generalized_lehmer_pool': [GeneralizedLehmerPool2d,
+    #                                 {'alpha': float(args.alpha), 'beta': float(args.beta),
+    #                                  'kernel_size': 2, 'stride': 2}],
+    #     'generalized_power_mean_pool': [GeneralizedPowerMeanPool2d,
+    #                                     {'gamma': float(args.gamma), 'delta': float(args.delta),
+    #                                      'kernel_size': 2, 'stride': 2}]
+    # }
 
-    pool = pools.get(args.pooling_type, [nn.MaxPool2d, {
-                     'kernel_size': 2, 'stride': 2}])
-    model = Net(pool)
+    # pool = pools.get(args.pooling_type, [nn.MaxPool2d, {
+    #                  'kernel_size': 2, 'stride': 2}])
+    # model = Net(pool)
+    if args.pooling_type == 'max_pool2d':
+        from flexpool.models.vgg import vgg11
+    else:
+        from flexpool.models.vgglhm import vgg11
+    model = vgg11(True)
     model.to(device)
     # freeze_poolings(model)
 
     loss_func = torch.nn.CrossEntropyLoss()
-    # optimizer = torch.optim.Adam(model.parameters(), lr=args.lr)
-    optimizer = torch.optim.Adam([{"params": model.pool1.parameters(), "lr": 0.00023},
-                                  {"params": model.pool2.parameters(), "lr": 0.00038},
-                                  {"params": model.pool3.parameters(), "lr": 0.00061},
-                                  {"params": model.block1.parameters()},
-                                  {"params": model.block2.parameters()},
-                                  {"params": model.block3.parameters()},
-                                  {"params": model.drop2.parameters()},
-                                  {"params": model.fc_layer.parameters()},
-                                  ],
-                                 lr=1e-3)
+    optimizer = torch.optim.Adam(model.parameters(), lr=args.lr)
+    # optimizer = torch.optim.Adam([{"params": model.pool1.parameters(), "lr": 0.00023},
+    #                               {"params": model.pool2.parameters(), "lr": 0.00038},
+    #                               {"params": model.pool3.parameters(), "lr": 0.00061},
+    #                               {"params": model.block1.parameters()},
+    #                               {"params": model.block2.parameters()},
+    #                               {"params": model.block3.parameters()},
+    #                               {"params": model.drop2.parameters()},
+    #                               {"params": model.fc_layer.parameters()},
+    #                               ],
+    #                              lr=1e-3)
 
     # FIXME gamma
     scheduler = torch.optim.lr_scheduler.StepLR(
         optimizer, step_size=len(train_loader), gamma=0.9)
+    
 
     start_epoch = 0
     if args.checkpoint_path is not None:
@@ -99,8 +120,9 @@ def run_training(args: Namespace):
         val_accuracy += val_accs
 
         if args.save_dir is not None:
-            checkpoint_path = os.path.join(
-                args.save_dir, str(epoch))
+            # checkpoint_path = os.path.join(
+            #     args.save_dir, str(epoch))
+            checkpoint_path = args.save_dir
             os.makedirs(checkpoint_path, exist_ok=True)
             checkpoint_path = os.path.join(checkpoint_path, 'checkpoint.pth')
             save_checkpoint(checkpoint_path, model, optimizer, scheduler)
@@ -122,8 +144,10 @@ def run_training(args: Namespace):
 
     module_types = {key: type(module) for key, module in model.named_modules()}
     for name, p in model.named_parameters():
-        if (module_types[name.split('.')[0]] is GeneralizedLehmerPool2d or
-                module_types[name.split('.')[0]] is GeneralizedPowerMeanPool2d):
+        # if (module_types[name.split('.')[0]] is GeneralizedLehmerPool2d or
+        #         module_types[name.split('.')[0]] is GeneralizedPowerMeanPool2d):
+        if ((module_types['.'.join(name.split('.')[:-1])] is GeneralizedLehmerPool2d) or
+                (module_types['.'.join(name.split('.')[:-1])] is GeneralizedPowerMeanPool2d)):
             df[name] = [p.data.item()]
 
     # save_path = os.path.join(results_root, args.run_id)
