@@ -16,6 +16,7 @@ from .utils import freeze_poolings, load_checkpoint, plot_poolings, save_checkpo
 from .validate import validate
 from flexnets.data import get_dataloaders
 from .utils import freeze_other_params, freeze_poolings, load_checkpoint, save_checkpoint, get_parameters
+from flexnets.nn.pooling import GeneralizedLehmerPool2d, GeneralizedPowerMeanPool2d, LPPool2d
 
 
 def run_training(args: Namespace):
@@ -44,7 +45,6 @@ def run_training(args: Namespace):
     loss_func = torch.nn.CrossEntropyLoss()
     # optimizer = torch.optim.SGD(get_parameters(model, args.lr), lr=args.lr)
     optimizer = torch.optim.Adam(get_parameters(model, args.lr), lr=args.lr)
-    # FIXME gamma
     scheduler = torch.optim.lr_scheduler.StepLR(
         optimizer, step_size=1, gamma=0.9)
 
@@ -59,7 +59,6 @@ def run_training(args: Namespace):
             scheduler,
             args.device == 'cuda'
         )
-        
 
     val_loss, val_accuracy = 0, 0
     train_loss, train_accuracy = 0, 0
