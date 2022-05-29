@@ -60,7 +60,7 @@ def run_training(args: Namespace):
     if args.pooling_type == 'max_pool2d':
         from flexpool.models.vgg import vgg11
     else:
-        from flexpool.models.vgglhm import vgg11
+        from flexnets.models.vgglhm import vgg11
     model = vgg11(True)
     pools: Dict[str, List] = {
         'max_pool2d': [nn.MaxPool2d,

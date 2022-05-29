@@ -1,1 +1,1 @@
-from .net import Net
+from .pool_nets import Net
