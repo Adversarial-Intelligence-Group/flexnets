@@ -201,6 +201,7 @@ $RECYCLE.BIN/
 # Custom rules
 /_trash
 /.vscode
-/_assets
-/.assets
+/_assets*
+/.assets*
+/.idea
 /lightning_logs
