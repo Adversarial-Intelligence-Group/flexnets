@@ -6,11 +6,12 @@ from argparse import ArgumentParser, Namespace
 def add_train_args(parser: ArgumentParser):
     parser.add_argument('--run_id',
                         type=str,
-                        default='ex_1',
+                        default='ex_2',
                         help='Run ID')
     parser.add_argument('--conv_type',
                         type=str,
-                        default='conv2d',
+                        # default='conv2d',
+                        default='generalized_lehmer_conv',
                         choices=['conv2d', 'generalized_lehmer_conv', 'generalized_power_conv'])
     parser.add_argument('--pooling_type',
                         type=str,
