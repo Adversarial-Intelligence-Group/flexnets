@@ -59,6 +59,7 @@ def train(
 
         writer.add_scalar('train/loss', loss_avg, global_step=epoch)
         writer.add_scalar('train/accuracy', accs_avg, global_step=epoch)
-        writer.add_scalar('train/lr', scheduler.get_last_lr()[-1], global_step=epoch)
+        if scheduler is not None:
+            writer.add_scalar('train/lr', scheduler.get_last_lr()[-1], global_step=epoch)
 
     return loss_sum, accs_sum
