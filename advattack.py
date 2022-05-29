@@ -50,7 +50,8 @@ if __name__ == "__main__":
     model.load_state_dict(state['model'])
     model.cuda()
 
-    epsilons = [0.0001, 0.0005, 0.001, 0.005, 0.008, 0.01, 0.015, 0.02]
+    # epsilons = [0.0001, 0.0005, 0.001, 0.005, 0.008, 0.01, 0.015, 0.02]
+    epsilons = np.linspace(0.0001, 0.025, 10)
     for epoch, eps in enumerate(epsilons):
         writer.add_scalar('pgd/eps', eps, global_step=epoch)
         adversary = LinfPGDAttack(

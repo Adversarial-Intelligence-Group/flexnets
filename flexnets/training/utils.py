@@ -1,4 +1,4 @@
-from typing import List, Union
+from typing import Dict, List, Union
 import torch
 import torch.nn as nn
 from torch.optim.lr_scheduler import _LRScheduler
@@ -31,17 +31,23 @@ def plot_poolings(model: nn.Module, writer: SummaryWriter, tag: str, global_step
     module_types = {key: type(module) for key, module in model.named_modules()}
     for name, p in model.named_parameters():
         # if (module_types[name.split('.')[0]] is GeneralizedLehmerPool2d):
-        if (module_types['.'.join(name.split('.')[:-1])] is GeneralizedLehmerPool2d):
-            if ("alpha" in name) or ("beta" in name):
-                writer.add_scalar(tag+'/'+name, p.data.item(),
-                                    global_step=global_step)
+        if ("alpha" in name) or ("beta" in name):
+            writer.add_scalar(tag+'/'+name, p.data.item(),
+                                global_step=global_step)
 
         # if (module_types[name.split('.')[0]] is GeneralizedPowerMeanPool2d):
-        if (module_types['.'.join(name.split('.')[:-1])] is GeneralizedPowerMeanPool2d):
-            if ("gamma" in name) or ("delta" in name):
-                writer.add_scalar(tag+'/'+name, p.data.item(),
-                                    global_step=global_step)
+        if ("gamma" in name) or ("delta" in name):
+            writer.add_scalar(tag+'/'+name, p.data.item(),
+                                global_step=global_step)
 
+
+def freeze_other_params(model: nn.Module):
+    for name, p in model.named_parameters():
+        if (("alpha" in name) or ("beta" in name) 
+            or "gamma" in name or "delta" in name):
+            p.requires_grad = True
+        else:
+            p.requires_grad = False
 
 def freeze_poolings(model: nn.Module):
     module_types = {key: type(module) for key, module in model.named_modules()}
@@ -53,6 +59,16 @@ def freeze_poolings(model: nn.Module):
         if (module_types[name.split('.')[0]] is GeneralizedPowerMeanPool2d):
             if "gamma" in name or "delta" in name:
                 p.requires_grad = False
+
+def get_parameters(model: nn.Module, other_lr: float = 0.01) -> List[Dict]:
+    parameters = []
+    for name, p in model.named_parameters():
+        if (("alpha" in name) or ("beta" in name) or 
+            ("gamma" in name or "delta" in name)):
+            parameters.append({"params": p, "lr": other_lr})
+        else:
+            parameters.append({"params": p})
+    return parameters
 
 
 def clip_poolings(model: nn.Module):
@@ -70,6 +86,8 @@ def clip_poolings(model: nn.Module):
                 p.data = clip_data(p, 1.00001, 2.71828)
             if "delta" in name:
                 p.data = clip_data(p, -2.5, 1.5)
+
+
 
 
 def clip_data(parameters: torch.Tensor, min_clip_value: float, max_clip_value: float) -> torch.Tensor:

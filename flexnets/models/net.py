@@ -1,5 +1,7 @@
 from typing import List
 import torch.nn as nn
+from flexnets.nn import GeneralizedLehmerConvolution as Conv2d # FIXME
+# from torch.nn import Conv2d
 
 
 class Net(nn.Module):
@@ -13,31 +15,31 @@ class Net(nn.Module):
         self.pool3 = pool[0](**pool[1])
 
         self.block1 = nn.Sequential(
-            nn.Conv2d(in_channels=3, out_channels=32,
+            Conv2d(in_channels=3, out_channels=32,
                       kernel_size=3, padding=1),
 
             nn.BatchNorm2d(32),
             nn.ReLU(),
-            nn.Conv2d(in_channels=32, out_channels=64,
+            Conv2d(in_channels=32, out_channels=64,
                       kernel_size=3, padding=1),
             nn.ReLU(),
         )
         self.block2 = nn.Sequential(
-            nn.Conv2d(in_channels=64, out_channels=128,
+            Conv2d(in_channels=64, out_channels=128,
                       kernel_size=3, padding=1),
             nn.BatchNorm2d(128),
             nn.ReLU(),
-            nn.Conv2d(in_channels=128, out_channels=128,
+            Conv2d(in_channels=128, out_channels=128,
                       kernel_size=3, padding=1),
             nn.ReLU(),
         )
         self.drop2 = nn.Dropout2d(p=0.05)
         self.block3 = nn.Sequential(
-            nn.Conv2d(in_channels=128, out_channels=256,
+            Conv2d(in_channels=128, out_channels=256,
                       kernel_size=3, padding=1),
             nn.BatchNorm2d(256),
             nn.ReLU(),
-            nn.Conv2d(in_channels=256, out_channels=256,
+            Conv2d(in_channels=256, out_channels=256,
                       kernel_size=3, padding=1),
             nn.ReLU(),
         )
@@ -55,6 +57,6 @@ class Net(nn.Module):
         x = self.pool1(self.block1(x))
         x = self.drop2(self.pool2(self.block2(x)))
         x = self.pool3(self.block3(x))
-        x = x.view(x.size(0), -1)
+        x = x.reshape(x.shape[0], -1)
         x = self.fc_layer(x)
         return x
