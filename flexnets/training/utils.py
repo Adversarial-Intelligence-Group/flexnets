@@ -40,6 +40,9 @@ def plot_poolings(model: nn.Module, writer: SummaryWriter, tag: str, global_step
             writer.add_scalar(tag+'/'+name, p.data.item(),
                                 global_step=global_step)
 
+        if ("norm_type" in name):
+            writer.add_scalar(tag+'/'+name, p.data.item(), global_step=global_step)
+
 
 def freeze_other_params(model: nn.Module):
     for name, p in model.named_parameters():
@@ -74,18 +77,20 @@ def get_parameters(model: nn.Module, other_lr: float = 0.01) -> List[Dict]:
 def clip_poolings(model: nn.Module):
     module_types = {key: type(module) for key, module in model.named_modules()}
     for name, p in model.named_parameters():
-        if (module_types[name.split('.')[0]] is GeneralizedLehmerPool2d or module_types[name.split('.')[0]] is GeneralizedLehmerLayer):
-            if "alpha" in name:
-                p.data = clip_data(p, 1.00001, 2.71828)
-            if "beta" in name:
-                p.data = clip_data(p, -2.5, 1.5)
+        # if (module_types[name.split('.')[0]] is GeneralizedLehmerPool2d or module_types[name.split('.')[0]] is GeneralizedLehmerLayer):
+        if "alpha" in name:
+            p.data = clip_data(p, 1.00001, 2.71828)
+        if "beta" in name:
+            p.data = clip_data(p, -2.5, 1.5)
 
         # if (module_types[name.split('.')[0]] is GeneralizedPowerMeanPool2d):
-        if (module_types['.'.join(name.split('.')[:-1])] is GeneralizedPowerMeanPool2d):
-            if "gamma" in name:
-                p.data = clip_data(p, 1.00001, 2.71828)
-            if "delta" in name:
-                p.data = clip_data(p, -2.5, 1.5)
+        if "gamma" in name:
+            p.data = clip_data(p, 1.00001, 2.71828)
+        if "delta" in name:
+            p.data = clip_data(p, -2.5, 1.5)
+        
+        if "norm_type" in name:
+            p.data = clip_data(p, 1.00001, 4)
 
 
 

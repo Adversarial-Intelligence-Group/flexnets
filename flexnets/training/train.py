@@ -15,7 +15,7 @@ def train(
         model: nn.Module,
         train_loader: DataLoader,
         optimizer: torch.optim.Optimizer,
-        scheduler: _LRScheduler,
+        scheduler: _LRScheduler or None,
         loss_func: Callable,
         writer: SummaryWriter = None):
     model.train()
@@ -32,7 +32,8 @@ def train(
 
         loss.backward()
         optimizer.step()
-        scheduler.step()
+        if scheduler is not None:
+            scheduler.step()
 
         with torch.no_grad():
             acc = accuracy(outputs, targets)
