@@ -5,7 +5,7 @@ from flexnets.nn.convolution import GeneralizedLehmerConvolution, GeneralizedPow
 
 
 cfg = {
-    'NN': [32, 'BN', 64, 'M', 128, 'BN', 128, 'M', 256, 'BN', 256, 'M'],
+    'NN': [32, 'BN', 64, 'M', 128, 'BN', 128, 'M', 'D', 256, 'BN', 256, 'M'],
 }
 
 
@@ -20,6 +20,7 @@ class Net(nn.Module):
             nn.Dropout2d(p=0.15),
             nn.Linear(1024, 512),
             nn.ReLU(),
+            nn.Dropout2d(p=0.15),
             nn.Linear(512, 10)
         )
 
@@ -51,6 +52,8 @@ def make_layers(cfg, args):
     for out in cfg:
         if out == 'M':
             get_pooling(args, layers)
+        elif out == 'D':
+            layers += [nn.Dropout2d(p=0.15)]
         elif out == 'BN':
             batch_norm = True
         else:
