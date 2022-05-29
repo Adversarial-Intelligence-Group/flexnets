@@ -30,7 +30,7 @@ def get_datasets(args):
         data_path,
         train=False,
         download=True,
-        transform=transform)
+        transform=transforms.ToTensor())
 
     return train, test
 
