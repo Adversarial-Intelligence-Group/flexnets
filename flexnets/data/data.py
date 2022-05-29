@@ -38,7 +38,7 @@ def get_datasets(args):
 
     return train, test
 
-
+# FIXME
 def get_catsets(args):
     if args.normalize:
         trainset = ImageFolder(os.path.join(args.data_path+'catsdogs', 'train'),

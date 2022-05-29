@@ -5,7 +5,7 @@ from flexnets.nn.convolution import GeneralizedLehmerConvolution, GeneralizedPow
 
 
 cfg = {
-    'NN': [32, 'BN', 64, 'M', 128, 'BN', 128, 'M', 256, 'BN', 256, 'M'],
+    'NN': [32, 'BN', 64, 'M', 128, 'BN', 128, 'M',  256, 'BN', 256, 'M'],
 }
 
 
@@ -17,7 +17,6 @@ class Net(nn.Module):
         self.fc_layer = nn.Sequential(
             nn.Linear(4096, 1024),
             nn.ReLU(),
-            nn.Dropout2d(p=0.15),
             nn.Linear(1024, 512),
             nn.ReLU(),
             nn.Linear(512, 10)
