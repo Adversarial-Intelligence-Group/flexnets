@@ -8,6 +8,10 @@ def add_train_args(parser: ArgumentParser):
                         type=str,
                         default='ex_1',
                         help='Run ID')
+    parser.add_argument('--conv_type',
+                        type=str,
+                        default='conv2d',
+                        choices=['conv2d', 'generalized_lehmer_conv', 'generalized_power_conv'])
     parser.add_argument('--pooling_type',
                         type=str,
                         default='max_pool2d',

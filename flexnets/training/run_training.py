@@ -1,89 +1,48 @@
 import os
 import random
 from argparse import Namespace
-from pathlib import Path
 from typing import Dict, List
 
 import numpy as np
 import pandas as pd
 import torch
 import torch.nn as nn
-from flexpool.data import get_dataloaders
-from flexpool.models import Net
-from flexpool.nn.pooling import (GeneralizedLehmerPool2d,
-                                 GeneralizedPowerMeanPool2d)
 from torch.utils.tensorboard.writer import SummaryWriter
 
 from flexnets.models import Net
+
 from .train import train
 from .utils import freeze_poolings, load_checkpoint, plot_poolings, save_checkpoint
 from .validate import validate
 from flexnets.data import get_dataloaders
-from flexnets.nn.pooling import GeneralizedLehmerPool2d, GeneralizedPowerMeanPool2d
 from .utils import freeze_other_params, freeze_poolings, load_checkpoint, save_checkpoint, get_parameters
 
 
 def run_training(args: Namespace):
+    torch.manual_seed(args.seed)
+    np.random.seed(args.seed)
+    random.seed(args.seed)
 
     device = torch.device(
         'cpu' if not torch.cuda.is_available() else args.device)
 
     writer = SummaryWriter(args.logs_dir)
 
-    trainset = ImageFolder('./.assets/data/catsdogs/train/', transform=tf.Compose([tf.Resize(256),
-                                                                                   tf.RandomCrop(
-                                                                                       224, 224),
-                                                                                   tf.ToTensor()]))
-    valset = ImageFolder('./.assets/data/catsdogs/val/', transform=tf.Compose([tf.Resize(256),
-                                                                               tf.RandomCrop(
-                                                                                   224, 224),
-                                                                               tf.ToTensor()]))
-    train_loader = DataLoader(
-        trainset, 8, True, drop_last=True, num_workers=6)
-    val_loader = DataLoader(valset, 8, False, drop_last=True, num_workers=6)
+    train_loader, val_loader, test_loader = get_dataloaders(args)
 
-    # FIXME
-    # pools: Dict[str, List] = {
-    #     'max_pool2d': [nn.MaxPool2d,
-    #                    {'kernel_size': 2, 'stride': 2}],
-    #     'generalized_lehmer_pool': [GeneralizedLehmerPool2d,
-    #                                 {'alpha': float(args.alpha), 'beta': float(args.beta),
-    #                                  'kernel_size': 2, 'stride': 2}],
-    #     'generalized_power_mean_pool': [GeneralizedPowerMeanPool2d,
-    #                                     {'gamma': float(args.gamma), 'delta': float(args.delta),
-    #                                      'kernel_size': 2, 'stride': 2}]
-    # }
+    # if args.pooling_type == 'max_pool2d':
+    #     from flexpool.models.vgg import vgg11
+    # else:
+    #     from flexnets.models.vgglhm import vgg11
+    # model = vgg11(True)
 
-    # pool = pools.get(args.pooling_type, [nn.MaxPool2d, {
-    #                  'kernel_size': 2, 'stride': 2}])
-    # model = Net(pool)
-    if args.pooling_type == 'max_pool2d':
-        from flexpool.models.vgg import vgg11
-    else:
-        from flexnets.models.vgglhm import vgg11
-    model = vgg11(True)
-    pools: Dict[str, List] = {
-        'max_pool2d': [nn.MaxPool2d,
-                       {'kernel_size': 2, 'stride': 2}],
-        'generalized_lehmer_pool': [GeneralizedLehmerPool2d,
-                                    {'alpha': float(args.alpha), 'beta': float(args.beta),
-                                     'kernel_size': 2, 'stride': 2}],
-        'generalized_power_mean_pool': [GeneralizedPowerMeanPool2d,
-                                        {'gamma': float(args.gamma), 'delta': float(args.delta),
-                                         'kernel_size': 2, 'stride': 2}],
-        "lp_pool": [LPPool2d,
-                       {'norm_type': args.norm_type, 'kernel_size': 2, 'stride': 2}]
-    }
-
-    pool = pools.get(args.pooling_type, [nn.MaxPool2d, {
-                     'kernel_size': 2, 'stride': 2}])
-    model = Net(pool)
+    model = Net(args)
     model.to(device)
     # freeze_poolings(model)
 
     loss_func = torch.nn.CrossEntropyLoss()
-    optimizer = torch.optim.SGD(get_parameters(model, args.lr), lr=args.lr)
-    # optimizer = torch.optim.Adam(get_parameters(model, args.lr), lr=args.lr)
+    # optimizer = torch.optim.SGD(get_parameters(model, args.lr), lr=args.lr)
+    optimizer = torch.optim.Adam(get_parameters(model, args.lr), lr=args.lr)
     # optimizer = torch.optim.Adam([{"params": model.pool1.parameters(), "lr": 0.00023},
     #                               {"params": model.pool2.parameters(), "lr": 0.00038},
     #                               {"params": model.pool3.parameters(), "lr": 0.00061},
@@ -109,7 +68,7 @@ def run_training(args: Namespace):
             scheduler,
             args.device == 'cuda'
         )
-    freeze_other_params(model)
+    # freeze_other_params(model)
     optimizer = torch.optim.SGD(filter(lambda p: p.requires_grad, model.parameters()), lr=0.01)
     scheduler = torch.optim.lr_scheduler.StepLR(
         optimizer, step_size=len(train_loader), gamma=0.9)
