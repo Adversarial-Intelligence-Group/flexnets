@@ -6,12 +6,11 @@ from argparse import ArgumentParser, Namespace
 def add_train_args(parser: ArgumentParser):
     parser.add_argument('--run_id',
                         type=str,
-                        default='ex_2',
+                        default='ex_1',
                         help='Run ID')
     parser.add_argument('--conv_type',
                         type=str,
-                        # default='conv2d',
-                        default='generalized_lehmer_conv',
+                        default='conv2d',
                         choices=['conv2d', 'generalized_lehmer_conv', 'generalized_power_conv'])
     parser.add_argument('--pooling_type',
                         type=str,
@@ -24,7 +23,7 @@ def add_train_args(parser: ArgumentParser):
                         help='Device for training (default: cuda)')
     parser.add_argument('--data_path',
                         type=str,
-                        default='./.assets/data/',
+                        default='./_assets/data/',
                         help='Path to data')
     parser.add_argument('--checkpoint_path',
                         type=str,
@@ -87,6 +86,8 @@ def add_glm_args(parser: ArgumentParser):
                         # max=1.5,
                         help='Beta parameter for GLP')
 
+
+def add_lp_args(parser: ArgumentParser):
     parser.add_argument('--norm_type',
                         type=float,
                         default=2,
@@ -142,13 +143,14 @@ def parse_train_args() -> Namespace:
     parser = ArgumentParser()
     add_train_args(parser)
     temp_args, unk_args = parser.parse_known_args()
-    # if temp_args.pooling_type == 'generalized_lehmer_pool':
-    #     add_glm_args(parser)
-    # elif temp_args.pooling_type == 'generalized_power_mean_pool':
-    #     add_gpm_args(parser)
-    # FIXME needed for init layers in main
-    add_glm_args(parser)
-    add_gpm_args(parser)
+    if ((temp_args.pooling_type == 'generalized_lehmer_pool') or
+            (temp_args.conv_type == 'generalized_lehmer_conv')):
+        add_glm_args(parser)
+    elif ((temp_args.pooling_type == 'generalized_power_mean_pool') or
+          (temp_args.conv_type == 'generalized_power_conv')):
+        add_gpm_args(parser)
+    elif temp_args.pooling_type == 'lp_pool':
+        add_lp_args(parser)
     args = parser.parse_args()
     modify_train_args(args)
     return args

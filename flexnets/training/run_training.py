@@ -10,6 +10,7 @@ import torch.nn as nn
 from torch.utils.tensorboard.writer import SummaryWriter
 
 from flexnets.models import Net
+from flexnets.nn.convolution import GeneralizedLehmerConvolution, GeneralizedPowerConvolution
 
 from .train import train
 from .utils import freeze_poolings, load_checkpoint, plot_poolings, save_checkpoint
@@ -44,7 +45,7 @@ def run_training(args: Namespace):
 
     loss_func = torch.nn.CrossEntropyLoss()
     # optimizer = torch.optim.SGD(get_parameters(model, args.lr), lr=args.lr)
-    optimizer = torch.optim.Adam(get_parameters(model, args.lr), lr=args.lr)
+    optimizer = torch.optim.Adam(get_parameters(model, 1e-2), lr=args.lr)
     scheduler = torch.optim.lr_scheduler.StepLR(
         optimizer, step_size=1, gamma=0.9)
 
@@ -65,6 +66,7 @@ def run_training(args: Namespace):
 
     best_val_loss = 100
     best_counter = 0
+    best_model = None
 
     for epoch in range(start_epoch, start_epoch+args.epochs):
         train_losses, train_accs = train(epoch, model, train_loader, optimizer,
@@ -90,11 +92,14 @@ def run_training(args: Namespace):
         
         if best_val_loss >= (val_losses/len(val_loader)):
             best_val_loss = (val_losses/len(val_loader))
+            best_model = model.state_dict()
             best_counter = 0
         else:
             best_counter += 1
         
         if best_counter == 5:
+            checkpoint_path = os.path.join(args.save_dir, 'best_model.pth')
+            torch.save(best_model, checkpoint_path)
             break
 
     # results_root = Path(args.save_dir).parent
@@ -103,8 +108,7 @@ def run_training(args: Namespace):
         'Epochs': [args.epochs],
         'Batch size': [args.batch_size],
         'Pooling type': [args.pooling_type],
-        'Alpha': [args.alpha],
-        'Beta': [args.beta],
+        'Conv type': [args.conv_type],
         'Learning rate': [args.lr],
         'Accuracy train': [np.mean(train_accuracy)],
         'Accuracy validation': [np.mean(val_accuracy)],
@@ -117,7 +121,9 @@ def run_training(args: Namespace):
         # if (module_types[name.split('.')[0]] is GeneralizedLehmerPool2d or
         #         module_types[name.split('.')[0]] is GeneralizedPowerMeanPool2d):
         if ((module_types['.'.join(name.split('.')[:-1])] is GeneralizedLehmerPool2d) or
-                (module_types['.'.join(name.split('.')[:-1])] is GeneralizedPowerMeanPool2d)):
+                (module_types['.'.join(name.split('.')[:-1])] is GeneralizedPowerMeanPool2d) or
+                (module_types['.'.join(name.split('.')[:-1])] is GeneralizedLehmerConvolution) or
+                (module_types['.'.join(name.split('.')[:-1])] is GeneralizedPowerConvolution)):
             df[name] = [p.data.item()]
 
     # save_path = os.path.join(results_root, args.run_id)

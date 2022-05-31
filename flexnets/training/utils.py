@@ -79,15 +79,15 @@ def clip_poolings(model: nn.Module):
     for name, p in model.named_parameters():
         # if (module_types[name.split('.')[0]] is GeneralizedLehmerPool2d or module_types[name.split('.')[0]] is GeneralizedLehmerLayer):
         if "alpha" in name:
-            p.data = clip_data(p, 1.00001, 2.71828)
+            p.data = clip_data(p, 1.1, 2.4)
         if "beta" in name:
-            p.data = clip_data(p, -2.5, 1.5)
+            p.data = clip_data(p, -2.3, 1.5)
 
         # if (module_types[name.split('.')[0]] is GeneralizedPowerMeanPool2d):
         if "gamma" in name:
-            p.data = clip_data(p, 1.00001, 2.71828)
+            p.data = clip_data(p, 1.1, 2.4)
         if "delta" in name:
-            p.data = clip_data(p, -2.5, 1.5)
+            p.data = clip_data(p, -2.3, 1.5)
         
         if "norm_type" in name:
             p.data = clip_data(p, 1.00001, 4)
