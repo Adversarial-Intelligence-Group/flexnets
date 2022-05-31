@@ -8,6 +8,7 @@ from torch.nn.common_types import _size_2_t
 from typing import Optional, Union
 import math
 
+
 class GeneralizedLehmerConvolution(torch.nn.modules.conv._ConvNd):
     def __init__(
         self,
@@ -48,14 +49,18 @@ class GeneralizedLehmerConvolution(torch.nn.modules.conv._ConvNd):
         output_shape = ((x.shape[2] - self.kernel_size[0])//self.stride[0] + 1,
                         (x.shape[3] - self.kernel_size[1])//self.stride[1] + 1)
         # x: torch.Size([64, 3, 34, 34]) 3 -> 32 ch
-        x = F.unfold(input=x, kernel_size=self.kernel_size, dilation=self.dilation, stride=self.stride)  # torch.Size([64, 27, 1024])
-        n = self.kernel_size[0]*self.kernel_size[1]
-        multiplier = n/torch.log(self.alpha)
-        dotprod = x.transpose(1, 2).matmul(weight.reshape(weight.shape[0], -1).t()).transpose(1, 2)  #torch.Size([64, 32, 1024])
+        x = F.unfold(input=x, kernel_size=self.kernel_size, dilation=self.dilation,
+                     stride=self.stride)  # torch.Size([64, 27, 1024])
+        # n = self.kernel_size[0]*self.kernel_size[1]
+        # multiplier = n/torch.log(self.alpha)
+        dotprod = x.transpose(1, 2).matmul(weight.reshape(
+            weight.shape[0], -1).t()).transpose(1, 2)  # torch.Size([64, 32, 1024])
         numerator = torch.pow(self.alpha, (self.beta+1)*dotprod)
         denominator = torch.pow(self.alpha, self.beta*dotprod)
-        x = multiplier*torch.log(numerator/denominator)  #torch.Size([64, 32, 1024])
-        x = x.reshape(input.shape[0], self.out_channels, *output_shape) # torch.Size([64, 32, 32, 32])
+        # multiplier* #torch.Size([64, 32, 1024])
+        x = torch.log(numerator/denominator)/torch.log(self.alpha)
+        # torch.Size([64, 32, 32, 32])
+        x = x.reshape(input.shape[0], self.out_channels, *output_shape)
         # x = F.fold(dotprod, output_shape, (1, 1))
         if bias is not None:
             x += bias.reshape(1, bias.shape[0], 1, 1)
@@ -92,7 +97,6 @@ class GeneralizedPowerConvolution(torch.nn.modules.conv._ConvNd):
     def forward(self, input: Tensor) -> Tensor:
         return self._conv_forward(input, self.weight, self.bias)
 
-    
     def _conv_forward(self, input: Tensor, weight: Tensor, bias: Optional[Tensor]):
         if self.padding_mode != 'zeros':
             x = F.pad(input, self._reversed_padding_repeated_twice,
@@ -104,14 +108,17 @@ class GeneralizedPowerConvolution(torch.nn.modules.conv._ConvNd):
         output_shape = ((x.shape[2] - self.kernel_size[0])//self.stride[0] + 1,
                         (x.shape[3] - self.kernel_size[1])//self.stride[1] + 1)
         # x: torch.Size([64, 3, 34, 34]) 3 -> 32 ch
-        x = F.unfold(input=x, kernel_size=self.kernel_size, dilation=self.dilation, stride=self.stride)  # torch.Size([64, 27, 1024])        
+        x = F.unfold(input=x, kernel_size=self.kernel_size, dilation=self.dilation,
+                     stride=self.stride)  # torch.Size([64, 27, 1024])
         # n = self.kernel_size[0]*self.kernel_size[1]
-        dotprod = x.transpose(1, 2).matmul(weight.reshape(weight.shape[0], -1).t()).transpose(1, 2) #torch.Size([64, 32, 1024])
-        numerator = torch.log(torch.pow(self.gamma, self.delta*dotprod)) # - torch.log(torch.tensor(n))
+        dotprod = x.transpose(1, 2).matmul(weight.reshape(
+            weight.shape[0], -1).t()).transpose(1, 2)  # torch.Size([64, 32, 1024])
+        # - torch.log(torch.tensor(n))
+        numerator = torch.log(torch.pow(self.gamma, self.delta*dotprod))
         denominator = (self.delta*torch.log(self.gamma))
-        x = numerator/denominator #torch.Size([64, 32, 1024])
-        x = x.reshape(input.shape[0], self.out_channels, *output_shape) # torch.Size([64, 32, 32, 32])
+        x = numerator/denominator  # torch.Size([64, 32, 1024])
+        # torch.Size([64, 32, 32, 32])
+        x = x.reshape(input.shape[0], self.out_channels, *output_shape)
         if bias is not None:
             x += bias.reshape(1, bias.shape[0], 1, 1)
         return x
-
