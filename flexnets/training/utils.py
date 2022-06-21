@@ -87,7 +87,7 @@ def clip_poolings(model: nn.Module):
         if "gamma" in name:
             p.data = clip_data(p, 1.1, 2.4)
         if "delta" in name:
-            p.data = clip_data(p, -2.3, 1.5)
+            p.data = clip_data(p, 0.1, 1.5) #-2.3, 1.5)
         
         if "norm_type" in name:
             p.data = clip_data(p, 1.00001, 4)
@@ -102,7 +102,7 @@ def clip_data(parameters: torch.Tensor, min_clip_value: float, max_clip_value: f
     max_clip_value = float(max_clip_value)
 
     if float(parameters.item()) > max_clip_value or float(parameters.item()) < min_clip_value:
-        print(parameters.item())  # TODO del
+        # print(parameters.item())  # TODO del
         return parameters.data.clamp(
             min=min_clip_value, max=max_clip_value).to(device)
     return parameters
