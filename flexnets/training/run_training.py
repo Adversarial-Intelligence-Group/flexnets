@@ -44,7 +44,9 @@ def run_training(args: Namespace):
     # freeze_other_params(model)
 
     loss_func = torch.nn.CrossEntropyLoss()
+    # loss_func = torch.nn.NLLLoss()
     # optimizer = torch.optim.SGD(get_parameters(model, args.lr), lr=args.lr)
+    # optimizer = torch.optim.Adam(get_parameters(model, 1e-2), lr=args.lr)
     optimizer = torch.optim.Adam(get_parameters(model, 1e-2), lr=args.lr)
     scheduler = torch.optim.lr_scheduler.StepLR(
         optimizer, step_size=1, gamma=0.9)

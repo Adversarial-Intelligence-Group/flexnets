@@ -2,10 +2,11 @@ from typing import List
 import torch.nn as nn
 from flexnets.nn.pooling import GeneralizedLehmerPool2d, GeneralizedPowerMeanPool2d, LPPool2d
 from flexnets.nn.convolution import GeneralizedLehmerConvolution, GeneralizedPowerConvolution
+from flexnets.nn.activation import GLSoftMax, GPSoftMax, GReLU
 
 
 cfg = {
-    'NN': [32, 'BN', 64, 'M', 128, 'BN', 128, 'M', 'D', 256, 'BN', 256, 'M'],
+    'NN': [32, 'BN', 64, 'M', 128, 'BN', 128, 'M', 'D', 256]#, 'BN', 256, 'M'],
 }
 
 
@@ -14,6 +15,12 @@ class Net(nn.Module):
         super(Net, self).__init__()
 
         self.features = make_layers(cfg['NN'], args)
+        self.last_block = nn.Sequential(
+            GeneralizedLehmerConvolution(256, 256, 3, 1, 1, alpha=1.5, beta=1.3),
+            nn.BatchNorm2d(256),
+            GReLU(),
+            GeneralizedLehmerPool2d(1.5, 1.3, 2, 2),
+        )
         self.fc_layer = nn.Sequential(
             nn.Linear(4096, 1024),
             nn.ReLU(),
@@ -21,11 +28,14 @@ class Net(nn.Module):
             nn.Linear(1024, 512),
             nn.ReLU(),
             nn.Dropout2d(p=0.15),
-            nn.Linear(512, 10)
+            nn.Linear(512, 10),
+            # nn.LogSoftmax()
+            # GPSoftMax()
         )
 
     def forward(self, x):
         x = self.features(x)
+        x = self.last_block(x)
         x = x.reshape(x.size(0), -1)
         x = self.fc_layer(x)
         return x
@@ -59,9 +69,9 @@ def make_layers(cfg, args):
         else:
             conv2d = get_conv(args, in_channels, out)
             if batch_norm:
-                layers += [conv2d, nn.BatchNorm2d(out), nn.ReLU(inplace=True)]
+                layers += [conv2d, nn.BatchNorm2d(out), nn.ReLU(inplace=True)] #GReLU()]
             else:
-                layers += [conv2d, nn.ReLU(inplace=True)]
+                layers += [conv2d, nn.ReLU(inplace=True)] #GReLU()]
             in_channels = out
             batch_norm = False
     return nn.Sequential(*layers)
