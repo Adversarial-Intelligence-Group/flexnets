@@ -6,20 +6,58 @@ from flexnets.nn.activation import GLSoftMax, GPSoftMax, GReLU
 
 
 cfg = {
-    'NN': [32, 'BN', 64, 'M', 128, 'BN', 128, 'M', 'D', 256]#, 'BN', 256, 'M'],
+    'NN_last': [32, 'BN', 64, 'M', 128, 'BN', 128, 'M', 'D', 256],
+    'NN': [32, 'BN', 64, 'M', 128, 'BN', 128, 'M', 'D', 256, 'BN', 256, 'M'],
 }
 
 
-class Net(nn.Module):
+class Net0(nn.Module):
     def __init__(self, args):
         super(Net, self).__init__()
 
         self.features = make_layers(cfg['NN'], args)
+        self.fc_layer = nn.Sequential(
+            nn.Linear(4096, 1024),
+            nn.ReLU(),
+            nn.Dropout2d(p=0.15),
+            nn.Linear(1024, 512),
+            nn.ReLU(),
+            nn.Dropout2d(p=0.15),
+            nn.Linear(512, 10),
+            # nn.LogSoftmax()
+            # GPSoftMax()
+        )
+
+    def forward(self, x):
+        x = self.features(x)
+        x = x.reshape(x.size(0), -1)
+        x = self.fc_layer(x)
+        return x
+
+    def _initialize_weights(self):
+        for m in self.modules():
+            if isinstance(m, nn.modules.conv._ConvNd):
+                nn.init.kaiming_normal_(
+                    m.weight, mode='fan_out', nonlinearity='relu')
+                if m.bias is not None:
+                    nn.init.constant_(m.bias, 0)
+            elif isinstance(m, nn.BatchNorm2d):
+                nn.init.constant_(m.weight, 1)
+                nn.init.constant_(m.bias, 0)
+            elif isinstance(m, nn.Linear):
+                nn.init.normal_(m.weight, 0, 0.01)
+                nn.init.constant_(m.bias, 0)
+
+class Net(nn.Module): #_LastBlock
+    def __init__(self, args):
+        super(Net, self).__init__()
+
+        self.features = make_layers(cfg['NN_last'], args)
         self.last_block = nn.Sequential(
-            GeneralizedLehmerConvolution(256, 256, 3, 1, 1, alpha=1.5, beta=1.3),
+            GeneralizedLehmerConvolution(256, 256, 3, 1, 1, alpha=2.3, beta=-2.),
             nn.BatchNorm2d(256),
-            GReLU(),
-            GeneralizedLehmerPool2d(1.5, 1.3, 2, 2),
+            GReLU(1.3, 1.2),
+            GeneralizedLehmerPool2d(1.8, 1.3, 2, 2),
         )
         self.fc_layer = nn.Sequential(
             nn.Linear(4096, 1024),
@@ -54,7 +92,6 @@ class Net(nn.Module):
                 nn.init.normal_(m.weight, 0, 0.01)
                 nn.init.constant_(m.bias, 0)
 
-
 def make_layers(cfg, args):
     layers = []
     in_channels = 3
@@ -69,9 +106,9 @@ def make_layers(cfg, args):
         else:
             conv2d = get_conv(args, in_channels, out)
             if batch_norm:
-                layers += [conv2d, nn.BatchNorm2d(out), nn.ReLU(inplace=True)] #GReLU()]
+                layers += [conv2d, nn.BatchNorm2d(out), nn.ReLU(inplace=True)] #GReLU()] # #
             else:
-                layers += [conv2d, nn.ReLU(inplace=True)] #GReLU()]
+                layers += [conv2d, nn.ReLU(inplace=True)] #GReLU()] # #
             in_channels = out
             batch_norm = False
     return nn.Sequential(*layers)

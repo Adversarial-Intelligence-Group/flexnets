@@ -11,6 +11,7 @@
 # python3 main.py --run_id ex_2b_l --conv_type generalized_lehmer_conv --alpha 1.8 --beta -2
 
 # python3 main.py --run_id ex_3b_l --conv_type generalized_lehmer_conv --alpha 2.3 --beta -2
+# python3 main.py --run_id ex_3b_l_2 --conv_type generalized_lehmer_conv --alpha 2.4 --beta 0
 
 # python3 main.py --run_id ex_4b_l --conv_type generalized_lehmer_conv --alpha 1.8 --beta 1.3
 
@@ -35,5 +36,9 @@ python3 main.py --run_id ex_3d_p --conv_type generalized_power_conv --gamma 2.3 
 python3 main.py --run_id ex_4d_p --conv_type generalized_power_conv --gamma 1.8 --delta 1.3
 
 python3 main.py --run_id ex_5d_p --conv_type generalized_power_conv --gamma 2.3 --delta 1.3
+
+
+
+python3 main.py --run_id ex_gc_gp_net2 --conv_type generalized_lehmer_conv --alpha 1.5 --beta 0.1 --pooling_type generalized_lehmer_pool
 
 
