@@ -8,6 +8,7 @@ from torch.nn.common_types import _size_2_t
 from typing import Optional, Union
 import math
 
+
 class GeneralizedLehmerConvolution(torch.nn.modules.conv._ConvNd):
     def __init__(
         self,
@@ -63,7 +64,6 @@ class GeneralizedLehmerConvolution(torch.nn.modules.conv._ConvNd):
 
 
 class GeneralizedPowerConvolution(torch.nn.modules.conv._ConvNd):
-
     def __init__(
         self,
         in_channels: int,

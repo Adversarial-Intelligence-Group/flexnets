@@ -6,6 +6,8 @@ from torch.nn.parameter import Parameter
 from torch import Tensor
 
 
+# ALPHA i BETA primerno: BETA [-2 ; +1] ; ALPHA [+1.001 ; +4 ]
+
 class GeneralizedLehmerLayer(nn.Module):
     __constants__ = ['in_features', 'out_features', 'alpha', 'beta']
     in_features: int
@@ -15,7 +17,7 @@ class GeneralizedLehmerLayer(nn.Module):
     weight: Tensor
 
     def __init__(self, in_features: int, out_features: int, bias: bool = True,
-                 alpha: float = 1.5, beta: float = 0.5, device=None, dtype=None) -> None:
+                 alpha: float = 2, beta: float = 0.5, device=None, dtype=None) -> None:
         factory_kwargs = {'device': device, 'dtype': dtype}
         super(GeneralizedLehmerLayer, self).__init__()
         self.in_features = in_features
@@ -32,7 +34,8 @@ class GeneralizedLehmerLayer(nn.Module):
         self.reset_parameters()
 
     def reset_parameters(self) -> None:
-        nn.init.kaiming_uniform_(self.weight, a=math.sqrt(5))
+        # nn.init.kaiming_uniform_(self.weight, a=math.sqrt(5))
+        nn.init.xavier_uniform_(self.weight)
         if self.bias is not None:
             fan_in, _ = nn.init._calculate_fan_in_and_fan_out(self.weight)
             bound = 1 / math.sqrt(fan_in)
@@ -40,7 +43,7 @@ class GeneralizedLehmerLayer(nn.Module):
 
     def forward(self, input: Tensor) -> Tensor:
         n = input.size()[0]
-        m = input.matmul(self.weight.t()) + self.bias
+        m = input.matmul(self.weight.t()) + self.bias # F.linear(input, self.weight, self.bias)
 
         a = (n + 1) / torch.log(self.alpha)
         b = torch.log(torch.pow(self.alpha, ((self.beta + 1) * m)) / torch.pow(self.alpha, (self.beta * m)))

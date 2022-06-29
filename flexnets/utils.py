@@ -12,7 +12,7 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 from data.data import get_datasets
 from nn.pooling import GeneralizedLehmerPool2d
-from models import Net
+from models import CNN
 
 
 from nn.activation import GeneralizedSoftPlus
@@ -147,7 +147,7 @@ def set_seed(seed):
 set_seed(42)
 pool = GeneralizedLehmerPool2d(2.7, 1.5, kernel_size=2, stride=2)
 # pool = nn.MaxPool2d(kernel_size=2, stride=2)
-net = Net(pool)
+net = CNN(pool)
 
 
 args = argparse.Namespace()
