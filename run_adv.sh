@@ -16,3 +16,23 @@ python3 advattack.py --run_id ex_net4 --conv_type generalized_lehmer_conv --pool
 
 python3 advattack.py --run_id ex_net5 --batch_size 128 --checkpoint_path .assets_act/checkpoints/ex_13_net_220622-194214566333_max_pool2d/best_model.pth
 
+python3 advattack.py --run_id ex_gpc_net_lb --batch_size 128 --checkpoint_path .assets_net/checkpoints/ex_gpc_net_lb_220629-002457813090_max_pool2d/best_model.pth
+
+python3 advattack.py --run_id ex_4_relu --batch_size 128 --checkpoint_path .assets_act/checkpoints/ex_4_relu_220622-141734135682_max_pool2d/best_model.pth
+
+python3 advattack.py --run_id ex_glc_wor_net_lb --batch_size 128 --checkpoint_path .assets_net/checkpoints/ex_glc_wor_net_lb_220629-011031217160_max_pool2d/best_model.pth
+
+python3 advattack.py --run_id ex_glc_wor_net_lb2 --batch_size 128 --checkpoint_path .assets_net/checkpoints/ex_glc_wor_net_lb2_220629-014446409726_max_pool2d/best_model.pth
+
+
+python3 advattack.py --run_id ex_glc1_net_fb --batch_size 128 --checkpoint_path .assets_net/checkpoints/ex_glc1_net_fb_220629-111952653166_max_pool2d/best_model.pth
+
+
+
+
+
+
+
+
+
+

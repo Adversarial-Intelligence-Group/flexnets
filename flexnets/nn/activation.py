@@ -25,9 +25,6 @@ class GPSoftMax(nn.Module):
 
 
 class GReLU(nn.Module):
-    __constants__ = ['alpha', 'beta']
-    alpha: Parameter
-    beta: Parameter
 
     def __init__(self, alpha: float = 1.5, beta: float = 1.2) -> None:
         super(GReLU, self).__init__()

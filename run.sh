@@ -42,3 +42,21 @@ python3 main.py --run_id ex_5d_p --conv_type generalized_power_conv --gamma 2.3 
 python3 main.py --run_id ex_gc_gp_net2 --conv_type generalized_lehmer_conv --alpha 1.5 --beta 0.1 --pooling_type generalized_lehmer_pool
 
 
+python3 main.py --run_id ex_gpc_net_lb
+
+
+python3 main.py --run_id ex_glc_wor_net_lb
+
+python3 main.py --run_id ex_glc_net_fb
+
+
+python3 main.py --run_id ex_glc1_net_fb
+
+python3 main.py --run_id ex_GLN_clf
+
+
+
+
+
+
+
