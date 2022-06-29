@@ -16,7 +16,6 @@ python3 main.py --run_id ex_4b_l --conv_type generalized_lehmer_conv --alpha 1.8
 
 python3 main.py --run_id ex_5b_l --conv_type generalized_lehmer_conv --alpha 2.3 --beta 1.3
 
-
 python3 main.py --run_id ex_2g_p --conv_type generalized_power_conv --gamma 1.3 --delta -2
 
 python3 main.py --run_id ex_3g_p --conv_type generalized_power_conv --gamma 1.3 --delta -1
