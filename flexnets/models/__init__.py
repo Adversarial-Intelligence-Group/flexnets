@@ -1,1 +1,1 @@
-from .net import Net
+from .cnn import CNN

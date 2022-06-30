@@ -1,5 +1,5 @@
-from typing import List
 import torch.nn as nn
+from flexnets.nn.activation import GeneralizedLehmerSoftMax, GeneralizedPowerSoftMax
 from flexnets.nn.pooling import GeneralizedLehmerPool2d, GeneralizedPowerMeanPool2d, LPPool2d
 from flexnets.nn.convolution import GeneralizedLehmerConvolution, GeneralizedPowerConvolution
 
@@ -9,11 +9,13 @@ cfg = {
 }
 
 
-class Net(nn.Module):
+class CNN(nn.Module):
     def __init__(self, args):
-        super(Net, self).__init__()
+        super(CNN, self).__init__()
 
         self.features = make_layers(cfg['NN'], args)
+        self.activation_fn = get_activation_fn(args)
+
         self.fc_layer = nn.Sequential(
             nn.Linear(4096, 1024),
             nn.ReLU(),
@@ -28,6 +30,9 @@ class Net(nn.Module):
         x = self.features(x)
         x = x.reshape(x.size(0), -1)
         x = self.fc_layer(x)
+
+        if (self.activation_fn):
+            return self.activation_fn(x)
         return x
 
     def _initialize_weights(self):
@@ -91,3 +96,14 @@ def get_pooling(args, layers):
         layers += [LPPool2d(float(args.norm_type), kernel_size=2, stride=2)]
     else:
         layers += [nn.MaxPool2d(kernel_size=2, stride=2)]
+
+
+def get_activation_fn(args):
+    if (args.activation_fn_type == 'generalized_lehmer_softmax'):
+        return GeneralizedLehmerSoftMax(float(args.alpha_1), float(args.alpha_2),
+                                        float(args.beta_1), float(args.beta_2))
+    elif (args.activation_fn_type == 'generalized_power_softmax'):
+        return GeneralizedPowerSoftMax(float(args.gamma_1), float(args.gamma_2),
+                                       float(args.delta_1), float(args.delta_2))
+    else:
+        return None

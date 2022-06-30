@@ -1,19 +1,20 @@
-from typing import Callable
 import torch
 import torch.nn as nn
 from torch import Tensor
 from torch.utils.data.dataloader import DataLoader
 from torch.utils.tensorboard.writer import SummaryWriter
+
+from typing import Callable, Union
 from tqdm import tqdm
 
-from .utils import accuracy, clip_data, clip_poolings, plot_poolings
+from .utils import accuracy, clip_poolings, plot_poolings
 
 
 def validate(epoch: int,
              model: nn.Module,
              val_loader: DataLoader,
              loss_func: Callable[[Tensor, Tensor], Tensor],
-             writer: SummaryWriter = None):
+             writer: Union[SummaryWriter, None] = None):
     model.eval()
 
     loss_sum, accs_sum = 0, 0

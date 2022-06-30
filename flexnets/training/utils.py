@@ -1,10 +1,9 @@
-from typing import Dict, List, Union
 import torch
 import torch.nn as nn
 from torch.optim.lr_scheduler import _LRScheduler
-from flexnets.nn.layers import GeneralizedLehmerLayer
-from flexnets.nn.pooling import GeneralizedLehmerPool2d, GeneralizedPowerMeanPool2d
 from torch.utils.tensorboard.writer import SummaryWriter
+
+from typing import Dict, List, Union
 
 
 def accuracy(output: torch.Tensor, target: torch.Tensor, top_k=(1,)) -> Union[torch.Tensor, List[torch.Tensor]]:
@@ -30,44 +29,24 @@ def accuracy(output: torch.Tensor, target: torch.Tensor, top_k=(1,)) -> Union[to
 def plot_poolings(model: nn.Module, writer: SummaryWriter, tag: str, global_step: int):
     module_types = {key: type(module) for key, module in model.named_modules()}
     for name, p in model.named_parameters():
-        # if (module_types[name.split('.')[0]] is GeneralizedLehmerPool2d):
         if ("alpha" in name) or ("beta" in name):
             writer.add_scalar(tag+'/'+name, p.data.item(),
-                                global_step=global_step)
+                              global_step=global_step)
 
-        # if (module_types[name.split('.')[0]] is GeneralizedPowerMeanPool2d):
         if ("gamma" in name) or ("delta" in name):
             writer.add_scalar(tag+'/'+name, p.data.item(),
-                                global_step=global_step)
+                              global_step=global_step)
 
         if ("norm_type" in name):
-            writer.add_scalar(tag+'/'+name, p.data.item(), global_step=global_step)
+            writer.add_scalar(tag+'/'+name, p.data.item(),
+                              global_step=global_step)
 
-
-def freeze_other_params(model: nn.Module):
-    for name, p in model.named_parameters():
-        if (("alpha" in name) or ("beta" in name) 
-            or "gamma" in name or "delta" in name):
-            p.requires_grad = True
-        else:
-            p.requires_grad = False
-
-def freeze_poolings(model: nn.Module):
-    module_types = {key: type(module) for key, module in model.named_modules()}
-    for name, p in model.named_parameters():
-        if (module_types[name.split('.')[0]] is GeneralizedLehmerPool2d):
-            if ("alpha" in name) or ("beta" in name):
-                p.requires_grad = False
-
-        if (module_types[name.split('.')[0]] is GeneralizedPowerMeanPool2d):
-            if "gamma" in name or "delta" in name:
-                p.requires_grad = False
 
 def get_parameters(model: nn.Module, other_lr: float = 0.01) -> List[Dict]:
     parameters = []
     for name, p in model.named_parameters():
-        if (("alpha" in name) or ("beta" in name) or 
-            ("gamma" in name or "delta" in name)):
+        if (("alpha" in name) or ("beta" in name) or
+                ("gamma" in name or "delta" in name)):
             parameters.append({"params": p, "lr": other_lr})
         else:
             parameters.append({"params": p})
@@ -75,15 +54,12 @@ def get_parameters(model: nn.Module, other_lr: float = 0.01) -> List[Dict]:
 
 
 def clip_poolings(model: nn.Module):
-    module_types = {key: type(module) for key, module in model.named_modules()}
     for name, p in model.named_parameters():
-        # if (module_types[name.split('.')[0]] is GeneralizedLehmerPool2d or module_types[name.split('.')[0]] is GeneralizedLehmerLayer):
-        if "alpha" in name:
+        if "alpha" in name or "alpha_1" in name or "alpha_2":
             p.data = clip_data(p, 1.1, 2.4)
-        if "beta" in name:
+        if "beta" in name or "beta_1" in name or "beta_2":
             p.data = clip_data(p, -2.3, 1.5)
 
-        # if (module_types[name.split('.')[0]] is GeneralizedPowerMeanPool2d):
         if "gamma" in name:
             p.data = clip_data(p, 1.1, 2.4)
         if "delta" in name:
@@ -91,8 +67,6 @@ def clip_poolings(model: nn.Module):
         
         if "norm_type" in name:
             p.data = clip_data(p, 1.00001, 4)
-
-
 
 
 def clip_data(parameters: torch.Tensor, min_clip_value: float, max_clip_value: float) -> torch.Tensor:

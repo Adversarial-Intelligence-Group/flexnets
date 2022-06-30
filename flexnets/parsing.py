@@ -6,7 +6,7 @@ from argparse import ArgumentParser, Namespace
 def add_train_args(parser: ArgumentParser):
     parser.add_argument('--run_id',
                         type=str,
-                        default='ex_1',
+                        default='softmax_ex_1',
                         help='Run ID')
     parser.add_argument('--conv_type',
                         type=str,
@@ -16,6 +16,10 @@ def add_train_args(parser: ArgumentParser):
                         type=str,
                         default='max_pool2d',
                         choices=['max_pool2d', 'generalized_lehmer_pool', 'generalized_power_mean_pool', 'lp_pool'])
+    parser.add_argument('--activation_fn_type',
+                        type=str,
+                        default='generalized_lehmer_softmax',
+                        choices=['log_softmax', 'generalized_lehmer_softmax', 'generalized_power_softmax'])
     parser.add_argument('--device',
                         type=str,
                         choices=['cuda', 'cpu'],
@@ -111,6 +115,60 @@ def add_gpm_args(parser: ArgumentParser):
                         help='Beta parameter for GPM')
 
 
+def add_gls_args(parser: ArgumentParser):
+    parser.add_argument('--alpha_1',
+                        type=float,
+                        default=2.5,
+                        # min=1.0001,
+                        # max=2.718,
+                        help='Alpha parameter for GLS')
+    parser.add_argument('--beta_1',
+                        type=float,
+                        default=1.3,
+                        # min=-2.5,
+                        # max=1.5,
+                        help='Beta parameter for GLS')
+    parser.add_argument('--alpha_2',
+                        type=float,
+                        default=2.5,
+                        # min=1.0001,
+                        # max=2.718,
+                        help='Alpha parameter for GLS')
+    parser.add_argument('--beta_2',
+                        type=float,
+                        default=1.3,
+                        # min=-2.5,
+                        # max=1.5,
+                        help='Beta parameter for GLS')
+
+
+def add_gps_args(parser: ArgumentParser):
+    parser.add_argument('--gamma_1',
+                        type=float,
+                        default=2.5,
+                        # min=1.0001,
+                        # max=2.718,
+                        help='Gamma parameter for GPS')
+    parser.add_argument('--delta_1',
+                        type=float,
+                        default=1.3,
+                        # min=-2.5,
+                        # max=1.5,
+                        help='Delta parameter for GPS')
+    parser.add_argument('--gamma_2',
+                        type=float,
+                        default=2.5,
+                        # min=1.0001,
+                        # max=2.718,
+                        help='Gamma parameter for GPS')
+    parser.add_argument('--delta_2',
+                        type=float,
+                        default=1.3,
+                        # min=-2.5,
+                        # max=1.5,
+                        help='Delta parameter for GPS')
+
+
 def modify_train_args(args: Namespace):
     if args.logs_dir is not None:
         timestamp = datetime.now().strftime('%y%m%d-%H%M%S%f')
@@ -151,6 +209,12 @@ def parse_train_args() -> Namespace:
         add_gpm_args(parser)
     elif temp_args.pooling_type == 'lp_pool':
         add_lp_args(parser)
+
+    if (temp_args.activation_fn_type == 'generalized_lehmer_softmax'):
+        add_gls_args(parser)
+    elif (temp_args.activation_fn_type == 'generalized_power_softmax'):
+        add_gpm_args(parser)
+
     args = parser.parse_args()
     modify_train_args(args)
     return args

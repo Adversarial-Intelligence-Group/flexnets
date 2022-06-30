@@ -68,7 +68,6 @@ class GeneralizedLehmerConvolution(torch.nn.modules.conv._ConvNd):
 
 
 class GeneralizedPowerConvolution(torch.nn.modules.conv._ConvNd):
-
     def __init__(
         self,
         in_channels: int,

@@ -7,7 +7,7 @@ from advertorch.attacks import LinfPGDAttack
 from tqdm import tqdm
 
 from flexnets.data import get_dataloaders
-from flexnets.models import Net
+from flexnets.models import CNN
 from flexnets.nn.pooling import (GeneralizedLehmerPool2d,
                                  GeneralizedPowerMeanPool2d,
                                  LPPool2d)
@@ -53,7 +53,7 @@ if __name__ == "__main__":
     print(epsilons)
 
     pool = pools.get(args.pooling_type)
-    model = Net(pool)
+    model = CNN(pool)
     model.eval()
 
     state = torch.load(path)
