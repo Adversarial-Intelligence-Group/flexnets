@@ -105,6 +105,33 @@ input = torch.randn(20, 16, 50, 100)
 output = m(input)
 ```
 
+### GLSoftMax
+```python
+import flexnets.nn as nn
+
+m = nn.activation.GLSoftMax()
+input = torch.randn(2, 3)
+output = m(input)
+```
+
+### GPSoftMax
+```python
+import flexnets.nn as nn
+
+m = nn.activation.GPSoftMax()
+input = torch.randn(2, 3)
+output = m(input)
+```
+
+### GReLU
+```python
+import flexnets.nn as nn
+
+m = nn.activation.GReLU()
+input = torch.randn(2)
+output = m(input)
+```
+
 ### GeneralizedLehmerLayer
 ```python
 import flexnets.nn as nn

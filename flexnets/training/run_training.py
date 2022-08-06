@@ -2,22 +2,20 @@ import os
 import random
 from argparse import Namespace
 
+import torch
 import numpy as np
 import pandas as pd
-
-import torch
 from torchmetrics import MeanMetric
 from torch.utils.tensorboard.writer import SummaryWriter
 
-from flexnets.models import CNN
+from flexnets.models import Net
+from flexnets.data import get_dataloaders
 from flexnets.nn.convolution import GeneralizedLehmerConvolution, GeneralizedPowerConvolution
+from flexnets.nn.pooling import GeneralizedLehmerPool2d, GeneralizedPowerMeanPool2d, LPPool2d
 
 from .train import train
-from .utils import load_checkpoint, plot_poolings, save_checkpoint
 from .validate import validate
-from flexnets.data import get_dataloaders
-from .utils import load_checkpoint, save_checkpoint, get_parameters
-from flexnets.nn.pooling import GeneralizedLehmerPool2d, GeneralizedPowerMeanPool2d, LPPool2d
+from .utils import load_checkpoint, get_parameters, save_checkpoint
 
 
 def run_training(args: Namespace):
@@ -32,22 +30,12 @@ def run_training(args: Namespace):
 
     train_loader, val_loader, test_loader = get_dataloaders(args)
 
-    # if args.pooling_type == 'max_pool2d':
-    #     from flexpool.models.vgg import vgg11
-    # else:
-    #     from flexnets.models.vgglhm import vgg11
-    # model = vgg11(True)
-
-    model = CNN(args)
+    model = Net(args)
     model.to(device)
 
-    # loss_func = torch.nn.NLLLoss()
     loss_func = torch.nn.CrossEntropyLoss()
-    # loss_func = torch.nn.NLLLoss()
-    # optimizer = torch.optim.SGD(get_parameters(model, args.lr), lr=args.lr)
-    # optimizer = torch.optim.Adam(get_parameters(model, 1e-2), lr=args.lr)
     optimizer = torch.optim.Adam(get_parameters(model, 1e-2), lr=args.lr)
-    
+
     scheduler = torch.optim.lr_scheduler.StepLR(
         optimizer, step_size=1, gamma=0.9)
 

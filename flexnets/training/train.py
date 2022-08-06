@@ -5,7 +5,6 @@ from torch.utils.data.dataloader import DataLoader
 from torch.utils.tensorboard.writer import SummaryWriter
 from torchmetrics import SumMetric
 from torchmetrics.functional import accuracy
-
 from typing import Callable, Union
 from tqdm import tqdm
 
@@ -42,7 +41,6 @@ def train(
         if scheduler is not None:
             scheduler.step()
 
-        # TODO: do we need no_grad?
         with torch.no_grad():
             acc = accuracy(outputs, target, top_k=1)
 

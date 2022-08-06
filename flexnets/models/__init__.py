@@ -1,1 +1,1 @@
-from .cnn import CNN
+from .cnn import Net

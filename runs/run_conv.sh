@@ -47,12 +47,7 @@ python3 main.py --run_id ex_gpc_lb_net --pooling_type generalized_lehmer_pool --
 
 python3 advattack.py --run_id ex_gpc_lb_net --pooling_type generalized_lehmer_pool --batch_size 128 --checkpoint_path .assets_last_nets/checkpoints/ex_gpc_lb_net_220630-114521913464_generalized_lehmer_pool/best_model.pth
 
-
-
 python3 advattack.py --run_id ex_gpc_glp_lb --pooling_type generalized_lehmer_pool --batch_size 128 --checkpoint_path .assets_net/checkpoints/ex_gpc_net_lb_220629-002457813090_max_pool2d/best_model.pth
-
-
-
 
 python3 advattack.py --run_id ex_gln_train --batch_size 128 --checkpoint_path .assets_last_nets/checkpoints/ex_gln_train_220629-211314608394_max_pool2d/best_model.pth
 

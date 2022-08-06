@@ -4,7 +4,6 @@ from torch.nn.parameter import Parameter
 
 
 class GLM(nn.Module):
-
     def __init__(self, alpha: float = 1.5, beta: float = 1.2) -> None:
         super(GLM, self).__init__()
         self.alpha = Parameter(torch.tensor(
@@ -18,7 +17,6 @@ class GLM(nn.Module):
 
 
 class GPM(nn.Module):
-
     def __init__(self, delta: float = 1.5, gamma: float = 1.2) -> None:
         super(GPM, self).__init__()
         self.delta = Parameter(torch.tensor(
@@ -32,7 +30,6 @@ class GPM(nn.Module):
 
 
 class LNorm(nn.Module):
-
     def __init__(self) -> None:
         super(LNorm, self).__init__()
         self.glm_mean = GLM()
@@ -40,10 +37,10 @@ class LNorm(nn.Module):
 
     def forward(self, input: Tensor) -> Tensor:
         numerator = input - self.glm_mean(input)
-        return ( numerator / self.glm_std(numerator) )
+        return (numerator / self.glm_std(numerator))
+
 
 class PNorm(nn.Module):
-
     def __init__(self) -> None:
         super(PNorm, self).__init__()
         self.gpm_mean = GPM()
@@ -51,4 +48,4 @@ class PNorm(nn.Module):
 
     def forward(self, input: Tensor) -> Tensor:
         numerator = input - self.gpm_mean(input)
-        return ( numerator / self.gpm_std(numerator) )
+        return (numerator / self.gpm_std(numerator))

@@ -205,7 +205,7 @@ def parse_train_args() -> Namespace:
             (temp_args.conv_type == 'generalized_lehmer_conv')):
         add_glm_args(parser)
     if ((temp_args.pooling_type == 'generalized_power_mean_pool') or
-          (temp_args.conv_type == 'generalized_power_conv')):
+            (temp_args.conv_type == 'generalized_power_conv')):
         add_gpm_args(parser)
     if temp_args.pooling_type == 'lp_pool':
         add_lp_args(parser)

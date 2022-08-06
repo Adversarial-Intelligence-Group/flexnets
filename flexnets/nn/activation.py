@@ -4,8 +4,8 @@ from torch.nn.parameter import Parameter
 
 from flexnets.nn.preprocessing import LNorm, PNorm
 
-class GLSoftMax(nn.Module):
 
+class GLSoftMax(nn.Module):
     def __init__(self) -> None:
         super(GLSoftMax, self).__init__()
         self.lnorm = LNorm()

@@ -1,4 +1,3 @@
-from turtle import forward
 import torch
 from torch import nn
 from torch import Tensor
@@ -6,7 +5,6 @@ import torch.nn.functional as F
 from torch.nn.modules.utils import _pair
 from torch.nn.common_types import _size_2_t
 from typing import Optional, Union
-import math
 
 
 class GeneralizedLehmerConvolution(torch.nn.modules.conv._ConvNd):
@@ -24,7 +22,6 @@ class GeneralizedLehmerConvolution(torch.nn.modules.conv._ConvNd):
         alpha: float = 1.5,
         beta: float = 1.3
     ) -> None:
-        # factory_kwargs = {'device': device, 'dtype': dtype}
         kernel_size_ = _pair(kernel_size)
         stride_ = _pair(stride)
         padding_ = padding if isinstance(padding, str) else _pair(padding)
@@ -48,20 +45,14 @@ class GeneralizedLehmerConvolution(torch.nn.modules.conv._ConvNd):
 
         output_shape = ((x.shape[2] - self.kernel_size[0])//self.stride[0] + 1,
                         (x.shape[3] - self.kernel_size[1])//self.stride[1] + 1)
-        # x: torch.Size([64, 3, 34, 34]) 3 -> 32 ch
         x = F.unfold(input=x, kernel_size=self.kernel_size, dilation=self.dilation,
-                     stride=self.stride)  # torch.Size([64, 27, 1024])
-        # n = self.kernel_size[0]*self.kernel_size[1]
-        # multiplier = n/torch.log(self.alpha)
+                     stride=self.stride)
         dotprod = x.transpose(1, 2).matmul(weight.reshape(
-            weight.shape[0], -1).t()).transpose(1, 2)  # torch.Size([64, 32, 1024])
+            weight.shape[0], -1).t()).transpose(1, 2)
         numerator = torch.pow(self.alpha, (self.beta+1)*dotprod)
         denominator = torch.pow(self.alpha, self.beta*dotprod)
-        # multiplier* #torch.Size([64, 32, 1024])
         x = torch.log(numerator/denominator)/torch.log(self.alpha)
-        # torch.Size([64, 32, 32, 32])
         x = x.reshape(input.shape[0], self.out_channels, *output_shape)
-        # x = F.fold(dotprod, output_shape, (1, 1))
         if bias is not None:
             x += bias.reshape(1, bias.shape[0], 1, 1)
         return x
@@ -82,7 +73,6 @@ class GeneralizedPowerConvolution(torch.nn.modules.conv._ConvNd):
         gamma: float = 1.5,
         delta: float = 1.3
     ) -> None:
-        # factory_kwargs = {'device': device, 'dtype': dtype}
         kernel_size_ = _pair(kernel_size)
         stride_ = _pair(stride)
         padding_ = padding if isinstance(padding, str) else _pair(padding)
@@ -106,17 +96,13 @@ class GeneralizedPowerConvolution(torch.nn.modules.conv._ConvNd):
 
         output_shape = ((x.shape[2] - self.kernel_size[0])//self.stride[0] + 1,
                         (x.shape[3] - self.kernel_size[1])//self.stride[1] + 1)
-        # x: torch.Size([64, 3, 34, 34]) 3 -> 32 ch
         x = F.unfold(input=x, kernel_size=self.kernel_size, dilation=self.dilation,
-                     stride=self.stride)  # torch.Size([64, 27, 1024])
-        # n = self.kernel_size[0]*self.kernel_size[1]
+                     stride=self.stride)
         dotprod = x.transpose(1, 2).matmul(weight.reshape(
-            weight.shape[0], -1).t()).transpose(1, 2)  # torch.Size([64, 32, 1024])
-        # - torch.log(torch.tensor(n))
+            weight.shape[0], -1).t()).transpose(1, 2)
         numerator = torch.log(torch.pow(self.gamma, self.delta*dotprod))
         denominator = (self.delta*torch.log(self.gamma))
-        x = numerator/denominator  # torch.Size([64, 32, 1024])
-        # torch.Size([64, 32, 32, 32])
+        x = numerator/denominator
         x = x.reshape(input.shape[0], self.out_channels, *output_shape)
         if bias is not None:
             x += bias.reshape(1, bias.shape[0], 1, 1)

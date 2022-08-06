@@ -27,7 +27,6 @@ def accuracy(output: torch.Tensor, target: torch.Tensor, top_k=(1,)) -> Union[to
 
 
 def plot_poolings(model: nn.Module, writer: SummaryWriter, tag: str, global_step: int):
-    module_types = {key: type(module) for key, module in model.named_modules()}
     for name, p in model.named_parameters():
         if ("alpha" in name) or ("beta" in name):
             writer.add_scalar(tag+'/'+name, p.data.item(),
@@ -63,8 +62,8 @@ def clip_poolings(model: nn.Module):
         if "gamma" in name:
             p.data = clip_data(p, 1.1, 2.4)
         if "delta" in name:
-            p.data = clip_data(p, 0.1, 1.5) #-2.3, 1.5)
-        
+            p.data = clip_data(p, 0.1, 1.5)  # -2.3, 1.5)
+
         if "norm_type" in name:
             p.data = clip_data(p, 1.00001, 4)
 

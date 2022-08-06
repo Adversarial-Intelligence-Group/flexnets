@@ -3,7 +3,6 @@ import torch.nn as nn
 from torch import Tensor
 from torch.utils.data.dataloader import DataLoader
 from torch.utils.tensorboard.writer import SummaryWriter
-
 from typing import Callable, Union
 from tqdm import tqdm
 

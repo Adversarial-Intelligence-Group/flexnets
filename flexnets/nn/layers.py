@@ -6,8 +6,6 @@ from torch.nn.parameter import Parameter
 from torch import Tensor
 
 
-# ALPHA i BETA primerno: BETA [-2 ; +1] ; ALPHA [+1.001 ; +4 ]
-
 class GeneralizedLehmerLayer(nn.Module):
     __constants__ = ['in_features', 'out_features', 'alpha', 'beta']
     in_features: int
@@ -24,8 +22,10 @@ class GeneralizedLehmerLayer(nn.Module):
         self.out_features = out_features
         self.weight = Parameter(torch.empty(
             (out_features, in_features), **factory_kwargs))
-        self.alpha = Parameter(torch.tensor(alpha, dtype=torch.float64), requires_grad=True)
-        self.beta = Parameter(torch.tensor(beta, dtype=torch.float64), requires_grad=True)
+        self.alpha = Parameter(torch.tensor(
+            alpha, dtype=torch.float64), requires_grad=True)
+        self.beta = Parameter(torch.tensor(
+            beta, dtype=torch.float64), requires_grad=True)
         if bias:
             self.bias = Parameter(torch.empty(out_features, **factory_kwargs))
         else:
@@ -41,13 +41,10 @@ class GeneralizedLehmerLayer(nn.Module):
             bound = 1 / math.sqrt(fan_in)
             nn.init.uniform_(self.bias, -bound, bound)
 
-        # nn.init.normal_(self.weight, 0, 0.01)
-        # nn.init.constant_(self.bias, 0)
-
     def forward(self, input: Tensor) -> Tensor:
-        n = input.size()[0]
-        m = input.matmul(self.weight.t()) # F.linear(input, self.weight, self.bias)
+        m = input.matmul(self.weight.t())
 
         a = (1) / torch.log(self.alpha)
-        b = torch.log(torch.pow(self.alpha, ((self.beta + 1) * m)) / torch.pow(self.alpha, (self.beta * m)))
-        return a * b  + self.bias
+        b = torch.log(torch.pow(self.alpha, ((self.beta + 1) * m)
+                                ) / torch.pow(self.alpha, (self.beta * m)))
+        return a * b + self.bias

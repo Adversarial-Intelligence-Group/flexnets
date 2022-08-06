@@ -24,7 +24,6 @@ python3 advattack.py --run_id ex_glc_wor_net_lb --batch_size 128 --checkpoint_pa
 
 python3 advattack.py --run_id ex_glc_wor_net_lb2 --batch_size 128 --checkpoint_path .assets_net/checkpoints/ex_glc_wor_net_lb2_220629-014446409726_max_pool2d/best_model.pth
 
-
 python3 advattack.py --run_id ex_glc1_net_fb --batch_size 128 --checkpoint_path .assets_net/checkpoints/ex_glc1_net_fb_220629-111952653166_max_pool2d/best_model.pth
 
 
