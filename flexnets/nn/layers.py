@@ -17,15 +17,15 @@ class GeneralizedLehmerLayer(nn.Module):
     weight: Tensor
 
     def __init__(self, in_features: int, out_features: int, bias: bool = True,
-                 alpha: float = 2, beta: float = 0.5, device=None, dtype=None) -> None:
+                 alpha: float = 1.8, beta: float = 1.3, device=None, dtype=None) -> None:
         factory_kwargs = {'device': device, 'dtype': dtype}
         super(GeneralizedLehmerLayer, self).__init__()
         self.in_features = in_features
         self.out_features = out_features
         self.weight = Parameter(torch.empty(
             (out_features, in_features), **factory_kwargs))
-        self.alpha = Parameter(torch.tensor(alpha, dtype=torch.float64))
-        self.beta = Parameter(torch.tensor(beta, dtype=torch.float64))
+        self.alpha = Parameter(torch.tensor(alpha, dtype=torch.float64), requires_grad=True)
+        self.beta = Parameter(torch.tensor(beta, dtype=torch.float64), requires_grad=True)
         if bias:
             self.bias = Parameter(torch.empty(out_features, **factory_kwargs))
         else:
@@ -34,17 +34,20 @@ class GeneralizedLehmerLayer(nn.Module):
         self.reset_parameters()
 
     def reset_parameters(self) -> None:
-        # nn.init.kaiming_uniform_(self.weight, a=math.sqrt(5))
-        nn.init.xavier_uniform_(self.weight)
+        nn.init.kaiming_uniform_(self.weight, a=math.sqrt(5))
+        # nn.init.xavier_uniform_(self.weight)
         if self.bias is not None:
             fan_in, _ = nn.init._calculate_fan_in_and_fan_out(self.weight)
             bound = 1 / math.sqrt(fan_in)
             nn.init.uniform_(self.bias, -bound, bound)
 
+        # nn.init.normal_(self.weight, 0, 0.01)
+        # nn.init.constant_(self.bias, 0)
+
     def forward(self, input: Tensor) -> Tensor:
         n = input.size()[0]
-        m = input.matmul(self.weight.t()) + self.bias # F.linear(input, self.weight, self.bias)
+        m = input.matmul(self.weight.t()) # F.linear(input, self.weight, self.bias)
 
-        a = (n + 1) / torch.log(self.alpha)
+        a = (1) / torch.log(self.alpha)
         b = torch.log(torch.pow(self.alpha, ((self.beta + 1) * m)) / torch.pow(self.alpha, (self.beta * m)))
-        return a * b
+        return a * b  + self.bias
