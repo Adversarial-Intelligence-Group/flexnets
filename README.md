@@ -5,6 +5,10 @@
 
 <p align="center"> [<b><a href="">Paper</a></b>] &emsp; [<b><a href="#citation">Citation</a></b>] </p>
 
+<p align="center">
+  <img src="./architecture.png">
+</p>
+
 Abstract: *Convolutional Neural Network is one of the famous members of the deep
 learning family of neural network architectures, which is used for many purposes,
 including image classification. In spite of the wide adoption, such networks are known
@@ -37,6 +41,10 @@ Generalized Lehmer Dot Product or Generalized Lehmer Convolution (GLC) and Gener
 Generalized ReLU function (GReLU) with extra trainable parameter α and Generalized SoftMax with flexible normalization function (GLSoftMax and GPSoftMax) can be found in `flexnets/nn/activation.py`.
 
 ### Generalized Neuron
+<p align="center">
+  <img width="424" height="424"  src="./neuron.png">
+</p>
+
 Generalized Neuron is a new type of artificial neuron with trainable weights and with two additional parameter. Generalized Lehmer Layer (GLL) can be found in `flexnets/nn/layers.py`.
 
 ## Installation
