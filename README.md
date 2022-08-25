@@ -3,7 +3,7 @@
 <h4 align="center">Vagan Terziyan, Diana Malyk, Mariia Golovianko, Vladyslav Branytskyi</h4>
 
 
-<p align="center"> [<b><a href="">Paper</a></b>] &emsp; [<b><a href="#citation">Citation</a></b>] </p>
+<p align="center"> [<b><a href="https://doi.org/10.1016/j.neunet.2022.08.017">Paper</a></b>] &emsp; [<b><a href="#citation">Citation</a></b>] </p>
 
 <p align="center">
   <img src="./architecture.png">
@@ -150,4 +150,4 @@ output = m(input)
 ```
 
 ## Citation
-If you use the results presented in this paper or the code from the repository, please cite the relevant [paper]()
+If you use the results presented in this paper or the code from the repository, please cite the relevant [paper](https://doi.org/10.1016/j.neunet.2022.08.017).
