@@ -1,22 +1,28 @@
-cff-version: "1.2.0"
-message: "If you use this software, please cite it using these metadata."
-title: "Hyper-Flexible Convolutional Neural Networks Based on Generalized Lehmer and Power Means"
-authors: 
-  -
-    family-names: Terziyan
-    given-names: Vagan
-    orcid: "https://orcid.org/0000-0002-3174-0170"
-  -
-    family-names: Malyk
-    given-names: Diana
-  -
-    family-names: Golovianko
-    given-names: Mariia
-    orcid: "https://orcid.org/0000-0003-0734-4028"
-  -
-    family-names: Branytskyi
-    given-names: Vladyslav
-    orcid: "https://orcid.org/0000-0002-0821-8878"
-repository-code: "https://github.com/Adversarial-Intelligence-Group/flexnets.git"
-date-released: 2022
-license: MIT
+cff-version: 1.2.0
+title: >-
+  Hyper-flexible Convolutional Neural Networks based
+  on Generalized Lehmer and Power Means
+message: Please cite this software using these metadata.
+type: software
+authors:
+  - given-names: Vagan Terziyan
+    email: vagan.terziyan@jyu.fi
+    affiliation: 'University of Jyväskylä, Finland'
+    orcid: 'https://orcid.org/0000-0001-7732-2962'
+  - given-names: Diana Malyk
+    email: diana.malyk@nure.ua
+    affiliation: >-
+      Kharkiv National University of Radio
+      Electronics, Ukraine
+  - given-names: Mariia Golovianko
+    affiliation: >-
+      Kharkiv National University of Radio
+      Electronics, Ukraine
+    orcid: 'https://orcid.org/0000-0003-0734-4028'
+    email: mariia.golovianko@nure.ua
+  - affiliation: >-
+      Kharkiv National University of Radio
+      Electronics, Ukraine
+    given-names: Vladyslav Branytskyi
+    email: vladyslav.branytskyi@nure.ua
+    orcid: 'https://orcid.org/0000-0002-0821-8878'
