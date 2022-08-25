@@ -152,15 +152,15 @@ output = m(input)
 ## Citation
 If you use the results presented in this paper or the code from the repository, please cite the relevant [paper](https://doi.org/10.1016/j.neunet.2022.08.017).
 ```
-  @article{TERZIYAN2022,
-    title = {Hyper-flexible Convolutional Neural Networks based on Generalized Lehmer and Power Means},
-    journal = {Neural Networks},
-    year = {2022},
-    issn = {0893-6080},
-    doi = {https://doi.org/10.1016/j.neunet.2022.08.017},
-    url = {https://www.sciencedirect.com/science/article/pii/S0893608022003173},
-    author = {Vagan Terziyan and Diana Malyk and Mariia Golovianko and Vladyslav Branytskyi},
-    keywords = {Convolutional Neural Network, Generalization, Flexibility, Adversarial robustness, Pooling, Convolution, Activation function, Lehmer Mean, Power Mean},
-    abstract = {Convolutional Neural Network is one of the famous members of the deep learning family of neural network architectures, which is used for many purposes, including image classification. In spite of the wide adoption, such networks are known to be highly tuned to the training data (samples representing a particular problem), and they are poorly reusable to address new problems. One way to change this would be, in addition to trainable weights, to apply trainable parameters of the mathematical functions, which simulate various neural computations within such networks. In this way, we may distinguish between the narrowly focused task-specific parameters (weights) and more generic capability-specific parameters. In this paper, we suggest a couple of flexible mathematical functions (Generalized Lehmer Mean and Generalized Power Mean) with trainable parameters to replace some fixed operations (such as ordinary arithmetic mean or simple weighted aggregation), which are traditionally used within various components of a convolutional neural network architecture. We named the overall architecture with such an update as a hyper-flexible convolutional neural network. We provide mathematical justification of various components of such architecture and experimentally show that it performs better than the traditional one, including better robustness regarding the adversarial perturbations of testing data.}
-  }
+@article{TERZIYAN2022,
+  title = {Hyper-flexible Convolutional Neural Networks based on Generalized Lehmer and Power Means},
+  journal = {Neural Networks},
+  year = {2022},
+  issn = {0893-6080},
+  doi = {https://doi.org/10.1016/j.neunet.2022.08.017},
+  url = {https://www.sciencedirect.com/science/article/pii/S0893608022003173},
+  author = {Vagan Terziyan and Diana Malyk and Mariia Golovianko and Vladyslav Branytskyi},
+  keywords = {Convolutional Neural Network, Generalization, Flexibility, Adversarial robustness, Pooling, Convolution, Activation function, Lehmer Mean, Power Mean},
+  abstract = {Convolutional Neural Network is one of the famous members of the deep learning family of neural network architectures, which is used for many purposes, including image classification. In spite of the wide adoption, such networks are known to be highly tuned to the training data (samples representing a particular problem), and they are poorly reusable to address new problems. One way to change this would be, in addition to trainable weights, to apply trainable parameters of the mathematical functions, which simulate various neural computations within such networks. In this way, we may distinguish between the narrowly focused task-specific parameters (weights) and more generic capability-specific parameters. In this paper, we suggest a couple of flexible mathematical functions (Generalized Lehmer Mean and Generalized Power Mean) with trainable parameters to replace some fixed operations (such as ordinary arithmetic mean or simple weighted aggregation), which are traditionally used within various components of a convolutional neural network architecture. We named the overall architecture with such an update as a hyper-flexible convolutional neural network. We provide mathematical justification of various components of such architecture and experimentally show that it performs better than the traditional one, including better robustness regarding the adversarial perturbations of testing data.}
+}
 ```
